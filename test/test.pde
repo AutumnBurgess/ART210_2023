@@ -10,7 +10,8 @@ void setup(){
 }
 
 void draw(){
-  background(255);
+  fill(255,255,255,20);
+  rect(0,0,width,height);
   fill(0);
   circle(_cx, _cy, _radius*2);
   //x movement
