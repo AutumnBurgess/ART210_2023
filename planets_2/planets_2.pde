@@ -1,52 +1,60 @@
 int _planetCount = 30;
-float _minDis = 30;
-float _maxDis;
+int _screenSize = 1000;
+float _minDis = 80;
+float _maxDis = _screenSize/2;
 float _minSpeed = 0.2;
-float _maxSpeed = 2;
+float _maxSpeed = 2.5;
 float _minSize = 10;
-float _maxSize = 60;
+float _maxSize = 30;
 color _startColor;
+color _centerColor;
 color _endColor;
 
 ArrayList<Planet> planets = new ArrayList<Planet>();
 
 void setup(){
-  size(1000,1000);
+  size(_screenSize,_screenSize);
   noStroke();
-  
   colorMode(HSB,100,100,100);
+  
   _startColor = randomColor();
+  _centerColor = varyColor(_startColor);
   _endColor = contrastColor(_startColor);
-  _maxDis = width/2;
   
   for (int i = 0; i < _planetCount; i++){
-    Planet cur = new Planet();
-    cur.speed = random(_minSpeed,_maxSpeed) * randomSign();
-    cur.dist = splitBetween(_minDis, _maxDis, _planetCount, i);
-    cur.angle = random(0,360);
-    cur.size = random(_minSize, _maxSize);
-    cur.col = colorBetween(_startColor,_endColor,_planetCount,i);
-    if (random(-1,5) < 0){
-      Planet curMoon = new Planet();
-      curMoon.speed = random(_minSpeed,_maxSpeed) * randomSign();
-      curMoon.size = random(_minSize/2,_maxSize/2);
-      curMoon.dist = random(cur.size+curMoon.size+5, cur.size+curMoon.size+20);
-      curMoon.angle = random(0,360);
-      curMoon.col = color(255,0,0);
-      cur.moon = curMoon;
-      cur.hasMoon = true;
-    }
-    planets.add(cur);
+    planets.add(generatePlanet(i));
   }
 }
 
 void draw(){
-  fill(0,0,0,50);
+  fill(0,0,0,40);
   rect(0,0,width,height);
   translate(width/2,height/2);
+  fill(_centerColor);
+  circle(0,0,_minDis-5);
   for (int i = 0; i < _planetCount; i++){
     Planet cur = planets.get(i);
     cur.drawMe();
     cur.update();
   }
+}
+
+Planet generatePlanet(int i){
+  Planet myPlanet = new Planet();
+  myPlanet.speed = random(_minSpeed,_maxSpeed) * randomSign();
+  myPlanet.dist = splitBetween(_minDis, _maxDis, _planetCount, i);
+  myPlanet.angle = random(0,360);
+  myPlanet.size = random(_minSize, _maxSize);
+  myPlanet.col = colorBetween(_startColor,_endColor,_planetCount,i);
+  if (random(-1,3) < 0){
+    Planet myMoon = new Planet();
+    myMoon.speed = random(_minSpeed,_maxSpeed) * randomSign();
+    myMoon.size = random(myPlanet.size/3, myPlanet.size/2);
+    myMoon.dist = random(myPlanet.size+myMoon.size+1, myPlanet.size+myMoon.size+5);
+    myMoon.angle = random(0,360);
+    myMoon.col = varyColor(myPlanet.col);
+    myPlanet.moon = myMoon;
+    myPlanet.hasMoon = true;
+  }
+  return myPlanet;
 }

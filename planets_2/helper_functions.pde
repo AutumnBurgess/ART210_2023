@@ -31,3 +31,10 @@ color colorBetween(color min, color max, int count, int i){
   float b = splitBetween(brightness(min), brightness(max), count, i);
   return color(h,s,b);
 }
+
+color varyColor(color start){
+  float h = (random(-15,15) + hue(start)) % 100;
+  float s = (random(-20,20) + saturation(start)) % 100;
+  float b = (random(-20,20) + brightness(start)) % 100;
+  return color(h, s, b);
+}
