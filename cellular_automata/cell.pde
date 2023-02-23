@@ -34,9 +34,11 @@ class Cell {
   }
   
   void drawMe(){
-    fill(isAlive ? 50 : 255);
-    rect(this.x*this.size, this.y*this.size, this.size, this.size);
-    fill(255,0,0);
+    //fill(this.isAlive ? 50 : 255);
+    fill(50);
+    if (this.isAlive){
+      rect(this.x*this.size, this.y*this.size, this.size, this.size);
+    }
   }
   
   void check(){

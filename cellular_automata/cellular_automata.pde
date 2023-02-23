@@ -1,4 +1,4 @@
-final int _cellSize = 10;
+final int _cellSize = 2;
 
 int _cellsX;
 int _cellsY;
@@ -12,6 +12,7 @@ void setup(){
   stroke(200);
   _cellsX = width/_cellSize;
   _cellsY = height/_cellSize;
+  noStroke();
   
   cells = new Cell[_cellsX][_cellsY];
   for(int x = 0; x < _cellsX; x++){
@@ -27,9 +28,11 @@ void setup(){
 }
 
 void draw(){
+  background(255);
   for(int x = 0; x < _cellsX; x++){
     for(int y = 0; y < _cellsY; y++){
       cells[x][y].drawMe();
+      cells[x][y].check();
     }
   }
   if(_running){update();}
@@ -38,16 +41,10 @@ void draw(){
 void update(){
   for(int x = 0; x < _cellsX; x++){
     for(int y = 0; y < _cellsY; y++){
-      cells[x][y].check();
-    }
-  }
-  for(int x = 0; x < _cellsX; x++){
-    for(int y = 0; y < _cellsY; y++){
       cells[x][y].update();
     }
   }
 }
-
 void mousePressed(){
   if (!_running){
     int clickX = min(floor(mouseX) / _cellSize, _cellsX - 1);
@@ -65,5 +62,31 @@ void mouseDragged(){
 }
 
 void keyPressed(){
-  _running = !_running;
+  if (key == ' '){ 
+    _running = !_running;
+  }
+  if (!_running){
+    if (key == 'r'){
+      randomize();
+    }
+    if (key == 'q'){
+      clearCells();
+    }
+  }
+}
+
+void clearCells(){
+  for(int x = 0; x < _cellsX; x++){
+    for(int y = 0; y < _cellsY; y++){
+      cells[x][y].isAlive = false;
+    }
+  }
+}
+
+void randomize(){
+  for(int x = 0; x < _cellsX; x++){
+    for(int y = 0; y < _cellsY; y++){
+      cells[x][y].isAlive = random(-5,1) > 0;
+    }
+  }
 }
