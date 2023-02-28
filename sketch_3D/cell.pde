@@ -55,12 +55,39 @@ class Cell {
   
   void drawAlive(){
     fill(255);
+    stroke(0);
     if (this.isAlive){
     pushMatrix();
       translate(this.size/2, this.size/2, this.size/2);
       translate(this.x*this.size, this.y*this.size, this.z*this.size);
       box(this.size);
     popMatrix();
+    }
+  }
+  
+  void checkV1(){
+    /*
+    The first rule set resurrects dead cells if they have exactly 5 neighbors 
+    and kills live cells if they have less than 5 or exactly 8 neighbors. 
+    It was most interesting when the grid was initialized with each cell having a 5% chance of being alive. 
+    Unfortunately the directionless nature of the rules caused each pattern to grow outward 
+    in all directions which made for boring visuals.
+    */
+    int aliveCount = 0;
+    for(int i = 0; i < ns.size(); i++){
+      if(ns.get(i).isAlive){
+        aliveCount ++;
+      }
+    }
+    this.nextAlive = this.isAlive;
+    if(this.isAlive){
+      if(aliveCount < 5 || aliveCount == 8){
+        this.nextAlive = false;
+      }
+    } else {
+      if(aliveCount == 5){
+        this.nextAlive = true;
+      }
     }
   }
   
