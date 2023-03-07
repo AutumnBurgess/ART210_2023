@@ -2,15 +2,17 @@ class Ball {
   PVector location;
   PVector velocity;
   PVector acceleration;
+  PVector gravity;
   float bounceLoss;
   float radius;
   color col;
 
-  Ball(PVector l_, PVector v_, PVector a_) {
+  Ball(PVector l_, PVector v_, PVector g_, float r_) {
     location = l_;
     velocity = v_;
-    acceleration = a_;
-    radius = random(6,20);
+    gravity = g_;
+    acceleration = gravity;
+    radius = r_;
     bounceLoss = random(0.08,0.2);
     col = color(random(0,100), random(60,100), random(60,100));
   }
@@ -25,28 +27,32 @@ class Ball {
     location.add(velocity);
   }
 
-  void bounce(float left, float right, float top, float bottom) {
-    boolean bounceX = clampX(left + radius, right - radius);
-    boolean bounceY = clampY(top + radius, bottom - radius);
-    if (bounceX) {
+  void bounce(PVector topLeft, PVector bottomRight) {
+    float left = topLeft.x + radius;
+    float right = bottomRight.x - radius;
+    float top = topLeft.y + radius;
+    float bottom = bottomRight.y - radius;
+    boolean bouncedX = clampX(left, right);
+    boolean bouncedY = clampY(top, bottom);
+    if (bouncedX) {
       velocity.x *= -(1-bounceLoss);
       velocity.y *= 1 - (bounceLoss / 5);
     }
-    if (bounceY) {
+    if (bouncedY) {
       velocity.y *= -(1-bounceLoss);
       velocity.x *= 1 - (bounceLoss / 5);
     }
   }
   
-  void pullTo(PVector pullPos){
+  void pullTo(PVector pullPos, float pullStrength){
     PVector dir = PVector.sub(pullPos, location);
     dir.normalize();
-    dir.mult(MOUSE_STRENGTH);
+    dir.mult(pullStrength);
     acceleration = dir;
   }
   
   void noPull(){
-    acceleration = GRAVITY;
+    acceleration = gravity;
   }
 
   boolean clampX(float min, float max) {
@@ -61,9 +67,5 @@ class Ball {
     location.y = max(location.y, min);
     location.y = min(location.y, max);
     return last != location.y;
-  }
-  
-  boolean isOnFloor(){
-    return abs(velocity.y) == 0;
   }
 }
