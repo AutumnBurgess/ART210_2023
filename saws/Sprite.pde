@@ -52,7 +52,6 @@ class Sprite
         scale(this.scale);
         rotate(radians(this.rotation));
         translate(this.offset.x,this.offset.y);
-        
         this.anim[this.currentAnim].display();
       popMatrix(); 
       if (DEBUG) testDisplay();   
@@ -73,37 +72,4 @@ class Sprite
   }
   
   void check(){}
-  
-  /*
-  void bounce()
-  {
-    Collision coll = new Collision(this,true);
-    int res = coll.box2circle(100,100,width-200,height-200,false);
-    //if(res == Collision.RIGHT) this.location.x = 0;
-    
-    if(res == Collision.RIGHT || res == Collision.LEFT)
-    {
-      this.acceleration.x = this.acceleration.x * (-1.0);
-      this.velocity.x = this.velocity.x * (-1.0);
-    }
-    if(res == Collision.RIGHT || res == Collision.LEFT)
-    {
-      this.acceleration.x = this.acceleration.x * (-1.0);
-      this.velocity.x = this.velocity.x * (-1.0);
-    }
-  }
-  */
-  
-  void bounce(float left, float right, float top, float bottom)
-  {
-    this.location.x = constrain(this.location.x, left, right);
-    if(this.location.x <= left || this.location.x >= right){
-      this.velocity.x *= -1;
-    }
-    
-    this.location.y = constrain(this.location.y, top, bottom);
-    if(this.location.y <= top || this.location.y >= bottom){
-      this.velocity.y *= -1;
-    }
-  }
 }
