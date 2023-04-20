@@ -9,19 +9,27 @@ int startTime = 0;
 Audio audio = new Audio(this);
 boolean DEBUG = false;
 IntDict buttons = new IntDict();
-int game_state = 0;
-IntDict states = new IntDict();
+
+final int SPLASH = 0;
+final int WAITING = 1;
+final int RUNNING = 2;
+final int GAME_OVER = 3;
+int game_state = -1;
+
 Player player;
+PFont fontSmall;
+PFont fontLarge;
 Saw[] saws = new Saw[fastSaws + slowSaws];
+
 void setup()
 {
   size(600,600,P2D);
-  //fullScreen(P2D);
-  textSize(32);
+  fontSmall = createFont("BebasNeue-Regular.ttf", 32, true);
+  fontLarge = createFont("BebasNeue-Regular.ttf", 50, true);
   Ani.init(this);
   createSounds();
-  createStates();
-  startGame();
+  createSaws();
+  setGameState(WAITING);
 }
 
 void createSounds()
@@ -33,75 +41,41 @@ void createSounds()
   //audio.addMusic("song.mp3", "song");
 }
 
-void createStates()
-{
-  states.add("menu", 0);
-  states.add("running", 1);
-  states.add("over", 2);
-}
-
-void startGame()
-{
-  //size(1800,800);
-  player = new Player("player");
-  for(int i = 0; i < slowSaws; i++)
-  {
-    saws[i] = new SawSlow("saw" + str(i));
-  }
-  for(int i = slowSaws; i < fastSaws + slowSaws; i++)
-  {
-    saws[i] = new SawFast("saw" + str(i));
-  }
-  game_state = states.get("menu");
-}
-
 void draw()
 {
   background(255);
   stroke(1);
   fill(230);
   rect(100,100,width-200,height-200);
-  if(game_state == states.get("menu"))
+  switch (game_state)
   {
-    player.display();
-    for(Saw s : saws)
-    {
-      s.display();
-    }
-    fill(0);
-    text("press space to start", width/2 - 120, height/2);
-    if(keyHeld(" ") > 0)
-    {
-      game_state = states.get("running");
-      startTime = millis();
-    }
-  }
-  if(game_state == states.get("running"))
-  {
-    run();
-  }
-  else if (game_state == states.get("over"))
-  {
-    fill(0);
-    text("you survived " + millisAsTimer(timer) + "\npress r to restart", width/2 - 120, height/2);
+    case SPLASH:
+      splash();
+      break;
+    case WAITING:
+      waiting();
+      break;
+    case RUNNING:
+      running();
+      break;
+    case GAME_OVER:
+      game_over();
+      break;
   }
 }
 
-void run()
+void setGameState(int newState)
 {
-  player.display();
-  player.update();
-  player.check();
-  for(Saw s : saws)
+  game_state = newState;
+  switch (newState)
   {
-    s.display();
-    s.update();
-    s.check();
+    case RUNNING:
+      init_running();
+      break;
+    case WAITING:
+      init_waiting();
+      break;
   }
-  audio.update();
-  timer = millis() - startTime;
-  fill(0);
-  text(millisAsTimer(timer), 10, 30);
 }
 
 void keyPressed()
@@ -109,13 +83,11 @@ void keyPressed()
   buttons.set(str(key), 1);
   if(key == '[') DEBUG = false;
   if(key == ']') DEBUG = true;
-  if(key == 'r') startGame();
 }
 
 void keyReleased()
 {
   buttons.set(str(key), 0);
-  //bob.takeInput(key, false);
 }
 
 int keyHeld(String k)

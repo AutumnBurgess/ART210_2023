@@ -1,11 +1,12 @@
 class Saw extends Sprite {
   float rotSpeed = 1.5;
+  float moveSpeed = 1;
   
   Saw(String _id, int points, float outer, float inner, float hole, boolean middleSpikes, color col)
   {
     super(_id);
     PShape[] shapes = new PShape[1];
-    PShape sawShape = this.makeShape(points, outer, inner, hole, middleSpikes, col);
+    PShape sawShape = makeShape(points, outer, inner, hole, middleSpikes, col);
     shapes[0] = sawShape;
     this.registerAnimation(new Animation(shapes));
     this.offset = new PVector(outer, outer);
@@ -38,30 +39,5 @@ class Saw extends Sprite {
     if(this.location.y <= top || this.location.y >= bottom){
       this.velocity.y *= -1;
     }
-  }
-  
-  private PShape makeShape(int points, float outer, float inner, float hole, boolean middleSpikes, color col) {
-    float angle = TWO_PI / points;
-    float innerOffset = middleSpikes ? angle / 2 : 0;
-    
-    PShape out = createShape();
-    out.beginShape();
-    out.fill(col);
-    out.noStroke();
-    for (float i = 0; i <= TWO_PI; i += angle) {
-      out.vertex(outer * sin(i), outer * cos(i));
-      out.vertex(inner * sin(i+innerOffset), inner * cos(i+innerOffset));
-    }
-    if(hole != 0){
-      out.beginContour();
-      for (float i = TWO_PI; i >= 0; i -= angle) {
-        out.vertex(hole * sin(i), hole * cos(i));
-      }
-      out.vertex(0, hole);
-      out.vertex(0, outer);
-      out.endContour();
-    }
-    out.endShape();
-    return out;
   }
 }

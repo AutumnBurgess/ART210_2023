@@ -19,7 +19,7 @@ class Player extends Sprite
     this.scale = 0.2;
     this.h = 20;
     this.w = 20;
-    this.collRadius = 15;
+    this.collRadius = 17;
     this.location.x = 30;
   }
   
@@ -78,7 +78,7 @@ class Player extends Sprite
     for(Saw s : saws)
     {
       if(coll.circle2circle(s) == Collision.IN){
-        game_state = states.get("over");
+        setGameState(GAME_OVER);
         audio.playEffect("win");
       }
     }
