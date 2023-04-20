@@ -20,10 +20,10 @@ void init_waiting()
   player = new Player("player");
   for(int i = 0; i < slowSaws; i++)
   {
-    saws[i] = new SawSlow("saw" + str(i));
+    saws.add(new SawSlow("sawSlow " + str(i)));
   }
   for(int i = slowSaws; i < fastSaws + slowSaws; i++)
   {
-    saws[i] = new SawFast("saw" + str(i));
+    saws.add(new SawFast("sawFast " + str(i)));
   }
 }

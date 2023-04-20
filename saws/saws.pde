@@ -4,6 +4,7 @@ import processing.sound.*;
 
 int fastSaws = 5;
 int slowSaws = 7;
+
 int timer = 0;
 int startTime = 0;
 Audio audio = new Audio(this);
@@ -19,11 +20,13 @@ int game_state = -1;
 Player player;
 PFont fontSmall;
 PFont fontLarge;
-Saw[] saws = new Saw[fastSaws + slowSaws];
+ArrayList<Saw> saws = new ArrayList<Saw>();
+
+//SawSpawner spawn;
 
 void setup()
 {
-  size(600,600,P2D);
+  size(600, 600, P2D);
   fontSmall = createFont("BebasNeue-Regular.ttf", 32, true);
   fontLarge = createFont("BebasNeue-Regular.ttf", 50, true);
   Ani.init(this);
@@ -46,21 +49,21 @@ void draw()
   background(255);
   stroke(1);
   fill(230);
-  rect(100,100,width-200,height-200);
+  rect(100, 100, width-200, height-200);
   switch (game_state)
   {
-    case SPLASH:
-      splash();
-      break;
-    case WAITING:
-      waiting();
-      break;
-    case RUNNING:
-      running();
-      break;
-    case GAME_OVER:
-      game_over();
-      break;
+  case SPLASH:
+    splash();
+    break;
+  case WAITING:
+    waiting();
+    break;
+  case RUNNING:
+    running();
+    break;
+  case GAME_OVER:
+    game_over();
+    break;
   }
 }
 
@@ -69,20 +72,20 @@ void setGameState(int newState)
   game_state = newState;
   switch (newState)
   {
-    case RUNNING:
-      init_running();
-      break;
-    case WAITING:
-      init_waiting();
-      break;
+  case RUNNING:
+    init_running();
+    break;
+  case WAITING:
+    init_waiting();
+    break;
   }
 }
 
 void keyPressed()
 {
   buttons.set(str(key), 1);
-  if(key == '[') DEBUG = false;
-  if(key == ']') DEBUG = true;
+  if (key == '[') DEBUG = false;
+  if (key == ']') DEBUG = true;
 }
 
 void keyReleased()
@@ -99,7 +102,7 @@ int keyHeld(String k)
   catch (Exception e)
   {
     //before a button is pressed, it will not be in the dict, set it to 0 for later
-    buttons.set(k,0);
+    buttons.set(k, 0);
     return 0;
   }
 }

@@ -2,12 +2,10 @@ void running()
 {
   player.display();
   player.update();
-  player.check();
   for(Saw s : saws)
   {
     s.display();
     s.update();
-    s.check();
   }
   audio.update();
   timer = millis() - startTime;

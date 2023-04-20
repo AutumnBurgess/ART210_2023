@@ -56,17 +56,3 @@ class SawSlow extends Saw
     this.velocity = PVector.random2D().mult(2);
   }
 }
-
-class SawBuilder
-{
-  String _id;
-  int points;
-  float outer;
-  float inner;
-  float hole;
-  float collRadius;
-  boolean middleSpikes = false;
-  color col = color(200);
-  
-  
-}

@@ -7,10 +7,6 @@ class Sprite
   PVector velocity = new PVector(0,0);
   PVector acceleration = new PVector(0,0);
   
-  float w = 100;
-  float h = 100;
-  PVector reg = new PVector(w/2.0,h/2.0);
-  
   int maxAnim = 10;
   int currentAnim = 0;
   int nAnim = 0;
@@ -19,8 +15,10 @@ class Sprite
   float rotation = 0;
   PVector offset = new PVector(0,0);
   
-  float collRadius = w/2.0;
-  PVector collBox = new PVector(w,h);
+  float w;
+  float h;
+  
+  float collRadius;
   
   Sprite(String _id)
   {
@@ -66,14 +64,41 @@ class Sprite
     fill(color(255,100,100));
     circle(0,0,10);
     noFill();
-    stroke(color(100,100,255));
-    rect(-reg.x,-reg.y,this.w,this.h);
     noStroke();
     fill(color(0,0,255,100));
     circle(0,0,this.collRadius*2);
+    fill(0);
+    textAlign(CENTER);
+    textSize(15);
+    text(this.id, 0, 0);
   }
   
-  void check(){}
+  void bounceOnBounds()
+  {
+    float left = this.w;
+    float right = width-this.w;
+    float top = this.h;
+    float bottom = height-this.h;
+    this.location.x = constrain(this.location.x, left, right);
+    if(this.location.x <= left || this.location.x >= right){
+      this.velocity.x *= -1;
+    }
+    
+    this.location.y = constrain(this.location.y, top, bottom);
+    if(this.location.y <= top || this.location.y >= bottom){
+      this.velocity.y *= -1;
+    }
+  }
+  
+  void keepInBounds()
+  {
+    float left = this.w;
+    float right = width-this.w;
+    float top = this.h;
+    float bottom = height-this.h;
+    this.location.x = constrain(this.location.x, left, right);
+    this.location.y = constrain(this.location.y, top, bottom);
+  }
 }
 
 ///////////////////////////////////////ANIMATION///////////////////////////////////////
@@ -224,21 +249,21 @@ class Collision
     return(OUT);
   }
   
-  boolean box2box(float _x, float _y, float _w, float _h)
-  {
-    float myLeft = this.sprite.location.x;
-    float myRight = this.sprite.location.x + this.sprite.w;
-    float myTop = this.sprite.location.y;
-    float myBottom = this.sprite.location.y + this.sprite.h;
-    float otherLeft = _x;
-    float otherRight = _x + _w;
-    float otherTop = _y;
-    float otherBottom = _y + _h;
+  //boolean box2box(float _x, float _y, float _w, float _h)
+  //{
+  //  float myLeft = this.sprite.location.x;
+  //  float myRight = this.sprite.location.x + this.sprite.w;
+  //  float myTop = this.sprite.location.y;
+  //  float myBottom = this.sprite.location.y + this.sprite.h;
+  //  float otherLeft = _x;
+  //  float otherRight = _x + _w;
+  //  float otherTop = _y;
+  //  float otherBottom = _y + _h;
 
-    boolean intersectHorizontal = (myLeft <= otherRight) && (myRight >= otherLeft);
-    boolean intersectVertical = (myTop <= otherBottom) && (myBottom >= otherTop);
-    return intersectHorizontal && intersectVertical;
-  }
+  //  boolean intersectHorizontal = (myLeft <= otherRight) && (myRight >= otherLeft);
+  //  boolean intersectVertical = (myTop <= otherBottom) && (myBottom >= otherTop);
+  //  return intersectHorizontal && intersectVertical;
+  //}
 }
 
 ///////////////////////////////////////AUDIO///////////////////////////////////////

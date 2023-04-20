@@ -17,19 +17,22 @@ class Player extends Sprite
     //this.registerAnimation(new Animation("zombie_static","svg"));
     //this.registerAnimation(new Animation("zombie_static_reverse","svg"));
     this.scale = 0.2;
-    this.h = 20;
-    this.w = 20;
     this.collRadius = 17;
+    this.w = 20;
+    this.h = 20;
     this.location.x = 30;
   }
   
   void update()
   {
-    updateAcc();
+    takeInput();
+    super.update();
+    super.keepInBounds();
+    this.checkSaws();
     //this.chooseAnimation();
   }
   
-  void updateAcc()
+  void takeInput()
   {
     float v = keyHeld("s") - keyHeld("w");
     float h = keyHeld("d") - keyHeld("a");
@@ -42,35 +45,19 @@ class Player extends Sprite
       this.velocity.mult(drag);
     }
     this.velocity.limit(max_speed);
-    super.update();
+    
   }
   
-  void updateVel()
-  {
-    float v = keyHeld("s") - keyHeld("w");
-    float h = keyHeld("d") - keyHeld("a");
-    this.velocity.y = v;
-    this.velocity.x = h;
-    this.velocity.normalize();
-    this.velocity.mult(max_speed);
-    super.update();
-  }
-  
-  void check()
-  {
-    this.checkBounds();
-    this.checkSaws();
-  }
-  
-  void checkBounds()
-  {
-    float left = this.w;
-    float right = width-this.w;
-    float top = this.h;
-    float bottom = height-this.h;
-    this.location.x = constrain(this.location.x, left, right);
-    this.location.y = constrain(this.location.y, top, bottom);
-  }
+  //void takeInputOld()
+  //{
+  //  float v = keyHeld("s") - keyHeld("w");
+  //  float h = keyHeld("d") - keyHeld("a");
+  //  this.velocity.y = v;
+  //  this.velocity.x = h;
+  //  this.velocity.normalize();
+  //  this.velocity.mult(max_speed);
+  //  super.update();
+  //}
   
   void checkSaws()
   {

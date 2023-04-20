@@ -12,9 +12,9 @@ class Saw extends Sprite {
     this.offset = new PVector(outer, outer);
     this.collRadius = inner-5;
     this.w = outer;
-    this.h = outer;
-    this.location.x = random(this.w+50, width-this.w);
-    this.location.y = random(this.h, width-this.h);
+    this.h = inner;
+    this.location.x = random(this.collRadius+50, width-this.collRadius);
+    this.location.y = random(this.collRadius, width-this.collRadius);
     this.velocity = PVector.random2D().mult(1.5);
   }
   
@@ -24,20 +24,9 @@ class Saw extends Sprite {
     this.rotation += rotSpeed;
   }
   
-  void check()
+  void update()
   {
-    float left = this.w;
-    float right = width-this.w;
-    float top = this.h;
-    float bottom = height-this.h;
-    this.location.x = constrain(this.location.x, left, right);
-    if(this.location.x <= left || this.location.x >= right){
-      this.velocity.x *= -1;
-    }
-    
-    this.location.y = constrain(this.location.y, top, bottom);
-    if(this.location.y <= top || this.location.y >= bottom){
-      this.velocity.y *= -1;
-    }
+    super.update();
+    super.bounceOnBounds();
   }
 }
