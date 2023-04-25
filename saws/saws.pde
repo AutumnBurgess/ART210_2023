@@ -1,9 +1,15 @@
 import de.looksgood.ani.*;
 import de.looksgood.ani.easing.*;
 import processing.sound.*;
+import java.util.*;
 
-int fastSaws = 5;
-int slowSaws = 7;
+public enum SawType {
+  SLOW, FAST, TOPWALL, BOTTOMWALL
+}
+
+int fastSaws = 2;
+int slowSaws = 2;
+SawType[] startSaws = {SawType.SLOW, SawType.SLOW, SawType.FAST, SawType.FAST};
 
 int timer = 0;
 int startTime = 0;
@@ -21,17 +27,15 @@ Player player;
 PFont fontSmall;
 PFont fontLarge;
 ArrayList<Saw> saws = new ArrayList<Saw>();
-
-//SawSpawner spawn;
+ArrayList<SawSpawner> spawners = new ArrayList<SawSpawner>();
 
 void setup()
-{
+{ 
   size(600, 600, P2D);
   fontSmall = createFont("BebasNeue-Regular.ttf", 32, true);
   fontLarge = createFont("BebasNeue-Regular.ttf", 50, true);
   Ani.init(this);
   createSounds();
-  createSaws();
   setGameState(WAITING);
 }
 
@@ -52,19 +56,30 @@ void draw()
   rect(100, 100, width-200, height-200);
   switch (game_state)
   {
-  case SPLASH:
-    splash();
-    break;
-  case WAITING:
-    waiting();
-    break;
-  case RUNNING:
-    running();
-    break;
-  case GAME_OVER:
-    game_over();
-    break;
+    case SPLASH:
+      splash();
+      break;
+    case WAITING:
+      waiting();
+      break;
+    case RUNNING:
+      running();
+      break;
+    case GAME_OVER:
+      game_over();
+      break;
   }
+}
+
+void addSpawner(Saw toSpawn)
+{
+  SawSpawner spawn = new SawSpawner(spawners.size(), toSpawn);
+  spawners.add(spawn);
+}
+
+void addSaw(Saw toAdd)
+{
+  saws.add(toAdd);
 }
 
 void setGameState(int newState)

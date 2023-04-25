@@ -2,7 +2,7 @@ import java.util.*;
 ///////////////////////////////////////SPRITE///////////////////////////////////////
 class Sprite
 {
-  String id = "";
+  int id;
   PVector location = new PVector(width/2,height/2);
   PVector velocity = new PVector(0,0);
   PVector acceleration = new PVector(0,0);
@@ -20,7 +20,7 @@ class Sprite
   
   float collRadius;
   
-  Sprite(String _id)
+  Sprite(int _id)
   {
     this.id = _id;
   }
@@ -69,8 +69,8 @@ class Sprite
     circle(0,0,this.collRadius*2);
     fill(0);
     textAlign(CENTER);
-    textSize(15);
-    text(this.id, 0, 0);
+    textFont(fontLarge);
+    text(this.id, 0, 20);
   }
   
   void bounceOnBounds()
@@ -155,10 +155,24 @@ class Animation
     this.framesS = _shapes;
   }
   
+  Animation(PShape _shape)
+  {
+    this.isSvg = true;
+    this.framesS = new PShape[1];
+    this.framesS[0] = _shape;
+  }
+  
   Animation(PImage[] _images)
   {
     this.isSvg = false;
     this.framesI = _images;
+  }
+  
+  Animation(PImage _image)
+  {
+    this.isSvg = true;
+    this.framesI = new PImage[1];
+    this.framesI[0] = _image;
   }
   
   void display()

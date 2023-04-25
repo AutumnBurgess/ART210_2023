@@ -1,58 +1,110 @@
-PShape makeShape(int points, float outer, float inner, float hole, boolean middleSpikes, color col) {
-  float angle = TWO_PI / points;
-  float innerOffset = middleSpikes ? angle / 2 : 0;
-  
-  PShape out = createShape();
-  out.beginShape();
-  out.fill(col);
-  out.noStroke();
-  for (float i = 0; i <= TWO_PI; i += angle) {
-    out.vertex(outer * sin(i), outer * cos(i));
-    out.vertex(inner * sin(i+innerOffset), inner * cos(i+innerOffset));
-  }
-  if(hole != 0){
-    out.beginContour();
-    for (float i = TWO_PI; i >= 0; i -= angle) {
-      out.vertex(hole * sin(i), hole * cos(i));
-    }
-    out.vertex(0, hole);
-    out.vertex(0, outer);
-    out.endContour();
-  }
-  out.endShape();
-  return out;
-}
-
-//Saw(String _id, int points, float outer, float inner, float hole, boolean middleSpikes, color col)
-PShape[] sawShapeArr = new PShape[2];
-IntDict sawShapes = new IntDict();
-
-void createSaws()
+Saw sawFromType(SawType type, int id)
 {
-  PShape small = makeShape(12, 43, 32, 10, true, color(200, 50, 175));
-  sawShapeArr[0] = small;
-  sawShapes.set("small", 0);
-  
-  PShape large = makeShape(20, 80, 65, 18, false, color(150, 50, 50));
-  sawShapeArr[1] = large;
-  sawShapes.set("large", 1);
+  switch(type)
+  {
+    default:
+    case FAST:
+      return new SawFast(id);
+    case SLOW:
+      return new SawSlow(id);
+    case TOPWALL:
+      return new SawTop(id);
+    case BOTTOMWALL:
+      return new SawBottom(id);
+  }
 }
 
 class SawFast extends Saw
 {
-  SawFast(String _id)
+  SawFast(int _id)
   {
-    super(_id, 12, 43, 32, 10, true, color(200, 50, 175));
+    super(_id, new SawShape(SawType.FAST));
     this.velocity = PVector.random2D().mult(5);
     this.rotSpeed = 3;
+  }
+  
+  void update()
+  {
+    super.update();
+    super.bounceOnBounds();
   }
 }
 
 class SawSlow extends Saw
 {
-  SawSlow(String _id)
+  SawSlow(int _id)
   {
-    super(_id, 20, 80, 65, 18, false, color(150, 50, 50));
+    super(_id, new SawShape(SawType.SLOW));
     this.velocity = PVector.random2D().mult(2);
+  }
+  
+  void update()
+  {
+    super.update();
+    super.bounceOnBounds();
+  }
+}
+
+class SawTop extends SawWall
+{
+  SawTop(int id)
+  {
+    super(id);
+    this.location.x = width/2;
+    this.location.y = 0;
+  }
+}
+
+class SawBottom extends SawWall
+{
+  SawBottom(int id)
+  {
+    super(id);
+    this.location.x = width/2;
+    this.location.y = height;
+  }
+}
+
+class SawWall extends Saw
+{
+  SawWall(int _id)
+  {
+    super(_id, new SawShape(SawType.TOPWALL));
+    this.rotSpeed = 5;
+  }
+  
+  void update()
+  {
+    int speed = 8;
+    this.location.x = constrain(this.location.x, 0, width);
+    this.location.y = constrain(this.location.y, 0, height);
+    boolean onLeft = this.location.x == 0;
+    boolean onRight = this.location.x == width;
+    boolean onTop = this.location.y == 0;
+    boolean onBottom = this.location.y == height;
+    
+    if(onLeft && !onTop)
+    {
+      this.velocity.x = 0;
+      this.velocity.y = -speed;
+    }
+    if(onTop && !onRight)
+    {
+      this.velocity.x = speed;
+      this.velocity.y = 0;
+    }
+    if(onRight && !onBottom)
+    {
+      this.velocity.x = 0;
+      this.velocity.y = speed;
+    }
+    if(onBottom && !onLeft)
+    {
+      this.velocity.x = -speed;
+      this.velocity.y = 0;
+    }
+    
+    super.update();
+    
   }
 }

@@ -4,18 +4,10 @@ class Player extends Sprite
   float button_acc = 1.2;
   float drag = 0.6;
   
-  Player(String id)
+  Player(int id)
   {
     super(id);
-    PShape[] shapes = new PShape[1];
-    PShape playerShape = this.makeShape(200);
-    shapes[0] = playerShape;
-    this.registerAnimation(new Animation(shapes));
-    
-    //this.registerAnimation(new Animation("zombie","svg"));
-    //this.registerAnimation(new Animation("zombie_reverse","svg"));
-    //this.registerAnimation(new Animation("zombie_static","svg"));
-    //this.registerAnimation(new Animation("zombie_static_reverse","svg"));
+    this.registerAnimation(new Animation(this.makeShape(200)));
     this.scale = 0.2;
     this.collRadius = 17;
     this.w = 20;
@@ -47,17 +39,6 @@ class Player extends Sprite
     this.velocity.limit(max_speed);
     
   }
-  
-  //void takeInputOld()
-  //{
-  //  float v = keyHeld("s") - keyHeld("w");
-  //  float h = keyHeld("d") - keyHeld("a");
-  //  this.velocity.y = v;
-  //  this.velocity.x = h;
-  //  this.velocity.normalize();
-  //  this.velocity.mult(max_speed);
-  //  super.update();
-  //}
   
   void checkSaws()
   {
@@ -94,7 +75,7 @@ class Player extends Sprite
   {
     PShape out = createShape(ELLIPSE, size/2, size/2, size, size);
     out.setFill(color(25, 200, 25));
-    out.setStroke(false);
+    out.setStrokeWeight(6);
     return out;
   }
 }

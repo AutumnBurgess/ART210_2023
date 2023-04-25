@@ -17,13 +17,16 @@ void waiting()
 
 void init_waiting()
 {
-  player = new Player("player");
+  player = new Player(-1);
+  saws.clear();
   for(int i = 0; i < slowSaws; i++)
   {
-    saws.add(new SawSlow("sawSlow " + str(i)));
+    saws.add(sawFromType(SawType.SLOW, i));
   }
   for(int i = slowSaws; i < fastSaws + slowSaws; i++)
   {
-    saws.add(new SawFast("sawFast " + str(i)));
+    saws.add(sawFromType(SawType.FAST, i));
   }
+  saws.add(sawFromType(SawType.TOPWALL, fastSaws + slowSaws));
+  saws.add(sawFromType(SawType.BOTTOMWALL, fastSaws + slowSaws + 1));
 }
