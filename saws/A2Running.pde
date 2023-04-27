@@ -32,14 +32,8 @@ void newSaws()
 {
   if(timer >= nextSawTime)
   {
-    if(random(0,1) < 0.5)
-    {
-      addSpawner(new SawFast(saws.size()));
-    }
-    else
-    {
-      addSpawner(new SawSlow(saws.size()));
-    }
+    addSpawner(SAW_BUILDERS.get(spawnPattern[currentSpawn]).build(saws.size()));
+    currentSpawn = (currentSpawn + 1) % spawnPattern.length;
     setNextSaw();
   }
 }

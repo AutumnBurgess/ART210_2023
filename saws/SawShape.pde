@@ -7,12 +7,15 @@ class SawShape
   boolean middleSpikes = false;
   color col = color(0);
   boolean transparent = false;
+  static final int SMALL = 0;
+  static final int BIG = 1;
+  static final int WALL = 2;
   
-  SawShape(SawType type)
+  SawShape(int type)
   {
     switch(type)
     {
-      case FAST:
+      case SMALL:
         this.points = 12;
         this.outer = 43;
         this.inner = 32;
@@ -20,15 +23,14 @@ class SawShape
         this.col = color(200, 50, 175);
         this.middleSpikes = true;
         break;
-      case SLOW:
+      case BIG:
         this.points = 21;
         this.outer = 80;
         this.inner = 65;
         this.holeSize = 18;
         this.col = color(150, 50, 50);
         break;
-      case TOPWALL:
-      case BOTTOMWALL:
+      case WALL:
         this.points = 15;
         this.outer = 55;
         this.inner = 43;

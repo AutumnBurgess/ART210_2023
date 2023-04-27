@@ -19,14 +19,8 @@ void init_waiting()
 {
   player = new Player(-1);
   saws.clear();
-  for(int i = 0; i < slowSaws; i++)
+  for(int i = 0; i < startSaws.length; i++)
   {
-    saws.add(sawFromType(SawType.SLOW, i));
+    saws.add(SAW_BUILDERS.get(startSaws[i]).build(i));
   }
-  for(int i = slowSaws; i < fastSaws + slowSaws; i++)
-  {
-    saws.add(sawFromType(SawType.FAST, i));
-  }
-  saws.add(sawFromType(SawType.TOPWALL, fastSaws + slowSaws));
-  saws.add(sawFromType(SawType.BOTTOMWALL, fastSaws + slowSaws + 1));
 }

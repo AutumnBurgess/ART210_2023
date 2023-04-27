@@ -72,33 +72,6 @@ class Sprite
     textFont(fontLarge);
     text(this.id, 0, 20);
   }
-  
-  void bounceOnBounds()
-  {
-    float left = this.w;
-    float right = width-this.w;
-    float top = this.h;
-    float bottom = height-this.h;
-    this.location.x = constrain(this.location.x, left, right);
-    if(this.location.x <= left || this.location.x >= right){
-      this.velocity.x *= -1;
-    }
-    
-    this.location.y = constrain(this.location.y, top, bottom);
-    if(this.location.y <= top || this.location.y >= bottom){
-      this.velocity.y *= -1;
-    }
-  }
-  
-  void keepInBounds()
-  {
-    float left = this.w;
-    float right = width-this.w;
-    float top = this.h;
-    float bottom = height-this.h;
-    this.location.x = constrain(this.location.x, left, right);
-    this.location.y = constrain(this.location.y, top, bottom);
-  }
 }
 
 ///////////////////////////////////////ANIMATION///////////////////////////////////////
@@ -321,13 +294,13 @@ class Audio
   void playSong(String name)
   {
     int m = musicNames.get(name);
-    song[m].fadeIn();
+    song[m].play();
   }
   
   void stopSong(String name)
   {
     int m = musicNames.get(name);
-    song[m].fadeOut();
+    song[m].stop();
   }
   
   void addEffect(SoundEffect effect, String name)
@@ -369,7 +342,7 @@ class Song
     }
   }
   
-  void fadeIn()
+  void play()
   {
     if(this.level != 0){
       this.level = 0;
@@ -379,7 +352,7 @@ class Song
     Ani.to(this, 1, "level", 1);
   }
   
-  void fadeOut()
+  void stop()
   {
     Ani.to(this, 1, "level", 0);
   }

@@ -19,9 +19,19 @@ class Player extends Sprite
   {
     takeInput();
     super.update();
-    super.keepInBounds();
+    this.keepInBounds();
     this.checkSaws();
     //this.chooseAnimation();
+  }
+  
+  void keepInBounds()
+  {
+    float left = this.w;
+    float right = width-this.w;
+    float top = this.h;
+    float bottom = height-this.h;
+    this.location.x = constrain(this.location.x, left, right);
+    this.location.y = constrain(this.location.y, top, bottom);
   }
   
   void takeInput()

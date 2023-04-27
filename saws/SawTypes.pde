@@ -1,110 +1,110 @@
-Saw sawFromType(SawType type, int id)
+Hashtable<SawType, SawBuilder> SAW_BUILDERS = new Hashtable<SawType, SawBuilder>();
+void setupBuilders()
 {
-  switch(type)
+  for(SawType t : SawType.values())
   {
-    default:
-    case FAST:
-      return new SawFast(id);
-    case SLOW:
-      return new SawSlow(id);
-    case TOPWALL:
-      return new SawTop(id);
-    case BOTTOMWALL:
-      return new SawBottom(id);
+    SAW_BUILDERS.put(t, new SawBuilder(t));
   }
 }
 
-class SawFast extends Saw
+class SawBuilder
 {
-  SawFast(int _id)
-  {
-    super(_id, new SawShape(SawType.FAST));
-    this.velocity = PVector.random2D().mult(5);
-    this.rotSpeed = 3;
-  }
-  
-  void update()
-  {
-    super.update();
-    super.bounceOnBounds();
-  }
-}
+  private SawShape shape;
+  private SawBehavior behavior;
+  private float moveSpeed;
+  private float rotSpeed;
+  private PVector location;
+  private boolean randLocation = false;
+  private boolean randVelocity = false;
 
-class SawSlow extends Saw
-{
-  SawSlow(int _id)
+  SawBuilder(SawType type)
   {
-    super(_id, new SawShape(SawType.SLOW));
-    this.velocity = PVector.random2D().mult(2);
-  }
-  
-  void update()
-  {
-    super.update();
-    super.bounceOnBounds();
-  }
-}
-
-class SawTop extends SawWall
-{
-  SawTop(int id)
-  {
-    super(id);
-    this.location.x = width/2;
-    this.location.y = 0;
-  }
-}
-
-class SawBottom extends SawWall
-{
-  SawBottom(int id)
-  {
-    super(id);
-    this.location.x = width/2;
-    this.location.y = height;
-  }
-}
-
-class SawWall extends Saw
-{
-  SawWall(int _id)
-  {
-    super(_id, new SawShape(SawType.TOPWALL));
-    this.rotSpeed = 5;
-  }
-  
-  void update()
-  {
-    int speed = 8;
-    this.location.x = constrain(this.location.x, 0, width);
-    this.location.y = constrain(this.location.y, 0, height);
-    boolean onLeft = this.location.x == 0;
-    boolean onRight = this.location.x == width;
-    boolean onTop = this.location.y == 0;
-    boolean onBottom = this.location.y == height;
-    
-    if(onLeft && !onTop)
+    switch(type)
     {
-      this.velocity.x = 0;
-      this.velocity.y = -speed;
+      case SLOW:
+        this.setShape(SawShape.BIG)
+           .setBehavior(SawBehavior.BOUNCE)
+           .setMoveSpeed(2)
+           .setRotSpeed(3)
+           .randVelocity()
+           .randLocation();
+        break;
+      case FAST:
+        this.setShape(SawShape.SMALL)
+           .setBehavior(SawBehavior.BOUNCE)
+           .setMoveSpeed(5)
+           .setRotSpeed(1.5)
+           .randVelocity()
+           .randLocation();
+        break;
+      case TOPWALL:
+        this.setShape(SawShape.WALL)
+           .setBehavior(SawBehavior.WALL)
+           .setMoveSpeed(8)
+           .setRotSpeed(6)
+           .setLoc(new PVector(width/2, 0));
+        break;
+      case BOTTOMWALL:
+        this.setShape(SawShape.WALL)
+           .setBehavior(SawBehavior.WALL)
+           .setMoveSpeed(8)
+           .setRotSpeed(6)
+           .setLoc(new PVector(width/2, height));
+        break;
     }
-    if(onTop && !onRight)
+  }
+  SawBuilder setShape(int shapeType)
+  {
+    this.shape = new SawShape(shapeType);
+    return this;
+  }
+  SawBuilder setBehavior(SawBehavior b)
+  {
+    this.behavior = b;
+    return this;
+  }
+  SawBuilder setMoveSpeed(float s)
+  {
+    this.moveSpeed = s;
+    return this;
+  }
+  SawBuilder setRotSpeed(float s)
+  {
+    this.rotSpeed = s;
+    return this;
+  }
+  SawBuilder setLoc(PVector l)
+  {
+    this.location = l;
+    return this;
+  }
+  SawBuilder randLocation()
+  {
+    this.randLocation = true;
+    return this;
+  }
+  SawBuilder randVelocity()
+  {
+    this.randVelocity = true;
+    return this;
+  }
+  Saw build(int id)
+  {
+    Saw out = new Saw(id, this.shape);
+    out.moveSpeed = this.moveSpeed;
+    if(this.randVelocity) out.velocity = PVector.random2D().mult(out.moveSpeed);
+    out.rotSpeed = this.rotSpeed;
+    out.behavior = this.behavior;
+    if(this.randLocation)
     {
-      this.velocity.x = speed;
-      this.velocity.y = 0;
+      out.location.x = random(out.w+50, width-out.w);
+      out.location.y = random(out.w, width-out.w);
     }
-    if(onRight && !onBottom)
+    else
     {
-      this.velocity.x = 0;
-      this.velocity.y = speed;
+      out.location.x = this.location.x;
+      out.location.y = this.location.y;
     }
-    if(onBottom && !onLeft)
-    {
-      this.velocity.x = -speed;
-      this.velocity.y = 0;
-    }
-    
-    super.update();
-    
+    return out;
   }
 }

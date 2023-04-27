@@ -3,14 +3,15 @@ import de.looksgood.ani.easing.*;
 import processing.sound.*;
 import java.util.*;
 
-public enum SawType {
+enum SawType 
+{
   SLOW, FAST, TOPWALL, BOTTOMWALL
 }
 
-int fastSaws = 2;
-int slowSaws = 2;
-SawType[] startSaws = {SawType.SLOW, SawType.SLOW, SawType.FAST, SawType.FAST};
+SawType[] startSaws = {SawType.SLOW, SawType.SLOW, SawType.FAST, SawType.FAST, SawType.TOPWALL, SawType.BOTTOMWALL};
+SawType[] spawnPattern = {SawType.FAST, SawType.FAST, SawType.SLOW};
 
+int currentSpawn = 0;  
 int timer = 0;
 int startTime = 0;
 Audio audio = new Audio(this);
@@ -32,9 +33,11 @@ ArrayList<SawSpawner> spawners = new ArrayList<SawSpawner>();
 void setup()
 { 
   size(600, 600, P2D);
+  pixelDensity(2);
   fontSmall = createFont("BebasNeue-Regular.ttf", 32, true);
   fontLarge = createFont("BebasNeue-Regular.ttf", 50, true);
   Ani.init(this);
+  setupBuilders();
   createSounds();
   setGameState(WAITING);
 }
