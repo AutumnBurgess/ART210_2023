@@ -1,18 +1,20 @@
 class Player extends Sprite
 {
-  float max_speed = 4;
-  float button_acc = 1.2;
+  float max_speed = 5;
+  float button_acc = 1.25;
   float drag = 0.6;
+  Room room;
   
-  Player(int id)
+  Player(int id, Room r)
   {
     super(id);
-    this.registerAnimation(new Animation(this.makeShape(200)));
+    this.registerAnimation(new Animation(this.livingShape(200)));
+    this.registerAnimation(new Animation(this.deadShape(200)));
     this.scale = 0.2;
     this.collRadius = 17;
     this.w = 20;
     this.h = 20;
-    this.location.x = 30;
+    this.room = r;
   }
   
   void update()
@@ -53,13 +55,20 @@ class Player extends Sprite
   void checkSaws()
   {
     Collision coll = new Collision(this,true);
-    for(Saw s : saws)
+    for(Saw s : this.room.saws)
     {
-      if(coll.circle2circle(s) == Collision.IN){
-        setGameState(GAME_OVER);
-        audio.playEffect("hit");
+      if(!s.gone && coll.circle2circle(s) == Collision.IN){
+        this.die();
       }
     }
+  }
+  
+  void die()
+  {
+    this.currentAnim = 1;
+    audio.playEffect("hit");
+    delay(150);
+    setGameState(GAME_OVER);
   }
   
   void chooseAnimation()
@@ -81,10 +90,17 @@ class Player extends Sprite
     }
   }
   
-  PShape makeShape(float size)
+  PShape livingShape(float size)
   {
     PShape out = createShape(ELLIPSE, size/2, size/2, size, size);
     out.setFill(color(25, 200, 25));
+    out.setStrokeWeight(6);
+    return out;
+  }
+  PShape deadShape(float size)
+  {
+    PShape out = createShape(ELLIPSE, size/2, size/2, size, size);
+    out.setFill(color(200, 20, 10));
     out.setStrokeWeight(6);
     return out;
   }

@@ -1,33 +1,54 @@
+enum SawType
+{
+  SLOW, FAST, TOPWALL, BOTTOMWALL, STICKY, DROPPED, DROPPER
+}
 enum SawBehavior 
 {
-  BOUNCE, WALL, STICK
+  BOUNCE, WALL, STICK, DISAPPEAR, DROP
 }
-class Saw extends Sprite {
+class Saw extends Sprite{
   float rotSpeed = 1.5;
   float moveSpeed = 1;
   boolean stopRotation = false;
   boolean onWall = false;
-  float countDown = 0;
+  boolean gone = false;
+  float count = 0;
+  int displayOrder = 0;
   PVector nextVelocity = new PVector(0,0);
+  Room room;
   SawShape myShape;
   SawType type;
   SawBehavior behavior;
 
-  Saw(int _id, SawShape shape)
+  Saw(int _id, SawShape shape, Room r)
   {
     super(_id);
     this.myShape = shape;
     this.registerAnimation(new Animation(this.myShape.make()));
     this.offset = new PVector(this.myShape.outer, this.myShape.outer);
-    this.collRadius = this.myShape.inner-5;
+    this.collRadius = max(this.myShape.outer-20, this.myShape.inner - 5);
     this.w = this.myShape.outer;
     this.h = this.myShape.outer;
+    this.room = r;
+  }
+  
+  float getRotSpeed()
+  {
+    return this.rotSpeed;
+  }
+  
+  SawType getSawType()
+  {
+    return this.type;
   }
   
   void display()
   {
-    super.display();
-    if(!stopRotation) this.rotation += rotSpeed;
+    if(!this.gone)
+    {
+      super.display();
+      if(!stopRotation) this.rotation += rotSpeed;
+    }
   }
   
   void update()
@@ -45,6 +66,35 @@ class Saw extends Sprite {
       case STICK:
         this.stickyBounce();
         break;
+      case DISAPPEAR:
+        this.disappear();
+        break;
+      case DROP:
+        this.drop();
+        break;
+    }
+  }
+  
+  void disappear()
+  {
+    this.count++;
+    if(this.count >= 120)
+    {
+      this.gone = true;
+    }
+  }
+  
+  void drop()
+  {
+    this.bounce();
+    this.count--;
+    if(this.count <= 0)
+    {
+      Saw newSaw = SAW_BUILDERS.get(SawType.DROPPED).build(room.saws.size(), this.room);
+      newSaw.location = this.location.copy();
+      SAW_BUILDERS.get(SawType.DROPPED).setLoc(this.location.copy());
+      room.addSaw(newSaw);
+      this.count = 15;
     }
   }
   
@@ -75,13 +125,13 @@ class Saw extends Sprite {
         this.velocity.y = 0;
         this.onWall = true;
         this.stopRotation = true;
-        this.countDown = 10;
+        this.count = 10;
       }
     }
     else
     {
-      this.countDown --;
-      if(this.countDown == 0)
+      this.count --;
+      if(this.count == 0)
       {
         this.onWall = false;
         this.stopRotation = false;

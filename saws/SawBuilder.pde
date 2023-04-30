@@ -11,11 +11,12 @@ class SawBuilder
 {
   private SawShape shape;
   private SawBehavior behavior;
-  private static final float boringRange = 15;
+  private static final float boringRange = 30;
+  private int displayOrder = 0;
   private float moveSpeed;
   private float rotSpeed;
-  private PVector location;
-  private PVector velocity;
+  private PVector location = new PVector(width/2, height/2);
+  private PVector velocity = new PVector(0,0);
   private boolean randLocation = false;
   private boolean randVelocity = false;
 
@@ -27,17 +28,19 @@ class SawBuilder
         this.setShape(SawShape.BIG)
            .setBehavior(SawBehavior.BOUNCE)
            .setMoveSpeed(2)
-           .setRotSpeed(3)
+           .setRotSpeed(1.5)
            .randVelocity()
-           .randLocation();
+           .randLocation()
+           .setDisplayOrder(2);
         break;
       case FAST:
         this.setShape(SawShape.SMALL)
            .setBehavior(SawBehavior.BOUNCE)
            .setMoveSpeed(5)
-           .setRotSpeed(1.5)
+           .setRotSpeed(3)
            .randVelocity()
-           .randLocation();
+           .randLocation()
+           .setDisplayOrder(3);
         break;
       case STICKY:
         this.setShape(SawShape.GREEN)
@@ -46,7 +49,8 @@ class SawBuilder
            .setRotSpeed(5)
            .randVelocity()
            .setVelocity(new PVector(-5, -5))
-           .randLocation();
+           .randLocation()
+           .setDisplayOrder(5);
         break;
       case TOPWALL:
         this.setShape(SawShape.WALL)
@@ -54,7 +58,8 @@ class SawBuilder
            .setMoveSpeed(8)
            .setRotSpeed(6)
            .setVelocity(new PVector(8, 0))
-           .setLoc(new PVector(width/2, 0));
+           .setLoc(new PVector(width/2, 0))
+           .setDisplayOrder(1);
         break;
       case BOTTOMWALL:
         this.setShape(SawShape.WALL)
@@ -62,16 +67,34 @@ class SawBuilder
            .setMoveSpeed(8)
            .setRotSpeed(6)
            .setVelocity(new PVector(-8, 0))
-           .setLoc(new PVector(width/2, height));
+           .setLoc(new PVector(width/2, height))
+           .setDisplayOrder(1);
+        break;
+      case DROPPED:
+        this.setShape(SawShape.DROPPED)
+           .setBehavior(SawBehavior.DISAPPEAR)
+           .setMoveSpeed(0)
+           .setRotSpeed(2)
+           .setDisplayOrder(0);
+        break;
+      case DROPPER:
+        this.setShape(SawShape.DROPPER)
+           .setBehavior(SawBehavior.DROP)
+           .setMoveSpeed(3)
+           .setRotSpeed(3)
+           .randVelocity()
+           .randLocation()
+           .setDisplayOrder(4);
         break;
     }
   }
   
-  Saw build(int id)
+  Saw build(int id, Room room)
   {
-    Saw out = new Saw(id, this.shape);
+    Saw out = new Saw(id, this.shape, room);
     out.moveSpeed = this.moveSpeed;
-    if(this.randVelocity) 
+    out.displayOrder = this.displayOrder;
+    if(this.randVelocity)
     {
       do
       {
@@ -81,8 +104,7 @@ class SawBuilder
     }
     else
     {
-      out.velocity.x = this.velocity.x;
-      out.velocity.y = this.velocity.y;
+      out.velocity = this.velocity.copy();
     }
     out.rotSpeed = this.rotSpeed;
     out.behavior = this.behavior;
@@ -93,8 +115,7 @@ class SawBuilder
     }
     else
     {
-      out.location.x = this.location.x;
-      out.location.y = this.location.y;
+      out.location = this.location.copy();
     }
     return out;
   }
@@ -127,6 +148,11 @@ class SawBuilder
   SawBuilder setRotSpeed(float s)
   {
     this.rotSpeed = s;
+    return this;
+  }
+  SawBuilder setDisplayOrder(int order)
+  {
+    this.displayOrder = order;
     return this;
   }
   SawBuilder setLoc(PVector l)

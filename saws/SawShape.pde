@@ -11,6 +11,8 @@ class SawShape
   static final int BIG = 1;
   static final int WALL = 2;
   static final int GREEN = 3;
+  static final int DROPPER = 4;
+  static final int DROPPED = 5;
   
   SawShape(int type)
   {
@@ -22,7 +24,6 @@ class SawShape
         this.inner = 32;
         this.holeSize = 10;
         this.col = color(200, 50, 175);
-        this.middleSpikes = true;
         break;
       case BIG:
         this.points = 21;
@@ -33,15 +34,30 @@ class SawShape
         break;
       case WALL:
         this.points = 15;
-        this.outer = 55;
-        this.inner = 43;
+        this.outer = 65;
+        this.inner = 53;
         this.col = color(180);
         break;
       case GREEN:
         this.points = 23;
         this.outer = 30;
         this.inner = 24;
+        this.holeSize = 10;
         this.col = color(50,200,45);
+        break;
+      case DROPPER:
+        this.points = 35;
+        this.outer = 40;
+        this.inner = 32;
+        this.middleSpikes = true;
+        this.col = color(130,22,245);
+        break;
+      case DROPPED:
+        this.points = 8;
+        this.outer = 20;
+        this.inner = 15;
+        this.middleSpikes = true;
+        this.col = color(202, 103, 235);
         break;
     }
   }
