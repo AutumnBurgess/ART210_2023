@@ -57,7 +57,7 @@ class Player extends Sprite
     {
       if(coll.circle2circle(s) == Collision.IN){
         setGameState(GAME_OVER);
-        audio.playEffect("win");
+        audio.playEffect("hit");
       }
     }
   }

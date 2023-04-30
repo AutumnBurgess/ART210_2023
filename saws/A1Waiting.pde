@@ -19,6 +19,8 @@ void init_waiting()
 {
   player = new Player(-1);
   saws.clear();
+  spawners.clear();
+  currentSpawn = 0;
   for(int i = 0; i < startSaws.length; i++)
   {
     saws.add(SAW_BUILDERS.get(startSaws[i]).build(i));

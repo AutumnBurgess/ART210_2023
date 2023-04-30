@@ -11,9 +11,11 @@ class SawBuilder
 {
   private SawShape shape;
   private SawBehavior behavior;
+  private static final float boringRange = 15;
   private float moveSpeed;
   private float rotSpeed;
   private PVector location;
+  private PVector velocity;
   private boolean randLocation = false;
   private boolean randVelocity = false;
 
@@ -37,11 +39,21 @@ class SawBuilder
            .randVelocity()
            .randLocation();
         break;
+      case STICKY:
+        this.setShape(SawShape.GREEN)
+           .setBehavior(SawBehavior.STICK)
+           .setMoveSpeed(15)
+           .setRotSpeed(5)
+           .randVelocity()
+           .setVelocity(new PVector(-5, -5))
+           .randLocation();
+        break;
       case TOPWALL:
         this.setShape(SawShape.WALL)
            .setBehavior(SawBehavior.WALL)
            .setMoveSpeed(8)
            .setRotSpeed(6)
+           .setVelocity(new PVector(8, 0))
            .setLoc(new PVector(width/2, 0));
         break;
       case BOTTOMWALL:
@@ -49,10 +61,54 @@ class SawBuilder
            .setBehavior(SawBehavior.WALL)
            .setMoveSpeed(8)
            .setRotSpeed(6)
+           .setVelocity(new PVector(-8, 0))
            .setLoc(new PVector(width/2, height));
         break;
     }
   }
+  
+  Saw build(int id)
+  {
+    Saw out = new Saw(id, this.shape);
+    out.moveSpeed = this.moveSpeed;
+    if(this.randVelocity) 
+    {
+      do
+      {
+        out.velocity = PVector.random2D().mult(out.moveSpeed);
+      }
+      while(this.inBoringAngle(out.velocity));
+    }
+    else
+    {
+      out.velocity.x = this.velocity.x;
+      out.velocity.y = this.velocity.y;
+    }
+    out.rotSpeed = this.rotSpeed;
+    out.behavior = this.behavior;
+    if(this.randLocation)
+    {
+      out.location.x = random(out.w+50, width-out.w);
+      out.location.y = random(out.w, width-out.w);
+    }
+    else
+    {
+      out.location.x = this.location.x;
+      out.location.y = this.location.y;
+    }
+    return out;
+  }
+  boolean inBoringAngle(PVector v)
+  {
+    float angle = degrees(v.heading());
+    if(angle < boringRange) return false;
+    if(angle > 90 - boringRange && angle < 90 + boringRange) return true;
+    if(angle > 180 - boringRange && angle < 180 + boringRange) return true;
+    if(angle > 270 - boringRange && angle < 270 + boringRange) return true;
+    if(angle > 360 - boringRange) return true;
+    return false;
+  }
+  
   SawBuilder setShape(int shapeType)
   {
     this.shape = new SawShape(shapeType);
@@ -83,28 +139,14 @@ class SawBuilder
     this.randLocation = true;
     return this;
   }
+  SawBuilder setVelocity(PVector v)
+  {
+    this.velocity = v;
+    return this;
+  }
   SawBuilder randVelocity()
   {
     this.randVelocity = true;
     return this;
-  }
-  Saw build(int id)
-  {
-    Saw out = new Saw(id, this.shape);
-    out.moveSpeed = this.moveSpeed;
-    if(this.randVelocity) out.velocity = PVector.random2D().mult(out.moveSpeed);
-    out.rotSpeed = this.rotSpeed;
-    out.behavior = this.behavior;
-    if(this.randLocation)
-    {
-      out.location.x = random(out.w+50, width-out.w);
-      out.location.y = random(out.w, width-out.w);
-    }
-    else
-    {
-      out.location.x = this.location.x;
-      out.location.y = this.location.y;
-    }
-    return out;
   }
 }

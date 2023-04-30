@@ -10,6 +10,7 @@ class SawShape
   static final int SMALL = 0;
   static final int BIG = 1;
   static final int WALL = 2;
+  static final int GREEN = 3;
   
   SawShape(int type)
   {
@@ -35,6 +36,12 @@ class SawShape
         this.outer = 55;
         this.inner = 43;
         this.col = color(180);
+        break;
+      case GREEN:
+        this.points = 23;
+        this.outer = 30;
+        this.inner = 24;
+        this.col = color(50,200,45);
         break;
     }
   }

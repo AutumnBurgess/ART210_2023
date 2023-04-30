@@ -3,15 +3,15 @@ import de.looksgood.ani.easing.*;
 import processing.sound.*;
 import java.util.*;
 
-enum SawType 
+enum SawType
 {
-  SLOW, FAST, TOPWALL, BOTTOMWALL
+  SLOW, FAST, TOPWALL, BOTTOMWALL, STICKY
 }
 
-SawType[] startSaws = {SawType.SLOW, SawType.SLOW, SawType.FAST, SawType.FAST, SawType.TOPWALL, SawType.BOTTOMWALL};
-SawType[] spawnPattern = {SawType.FAST, SawType.FAST, SawType.SLOW};
+SawType[] startSaws = {SawType.SLOW, SawType.FAST, SawType.TOPWALL, SawType.BOTTOMWALL};
+SawType[] spawnPattern = {SawType.FAST, SawType.FAST, SawType.STICKY, SawType.SLOW};
 
-int currentSpawn = 0;  
+int currentSpawn = 0;
 int timer = 0;
 int startTime = 0;
 Audio audio = new Audio(this);
@@ -31,9 +31,9 @@ ArrayList<Saw> saws = new ArrayList<Saw>();
 ArrayList<SawSpawner> spawners = new ArrayList<SawSpawner>();
 
 void setup()
-{ 
-  size(600, 600, P2D);
-  pixelDensity(2);
+{
+  size(800, 800, P2D);
+  //pixelDensity(2);
   fontSmall = createFont("BebasNeue-Regular.ttf", 32, true);
   fontLarge = createFont("BebasNeue-Regular.ttf", 50, true);
   Ani.init(this);
@@ -44,7 +44,8 @@ void setup()
 
 void createSounds()
 {
-  SoundEffect hit = new SoundEffect(this, false, 0.001, 0.004, 0.3, 0.2);
+  //PApplet app_, boolean io_, float at_, float st_, float sl_, float rt_
+  SoundEffect hit = new SoundEffect(this, false, 0.01, 0.08, 0.15, 0.2);
   audio.addEffect(hit, "hit");
   SoundEffect win = new SoundEffect(this, true, 0.01, 0.004, 0.3, 0.4);
   audio.addEffect(win, "win");
@@ -59,18 +60,18 @@ void draw()
   rect(100, 100, width-200, height-200);
   switch (game_state)
   {
-    case SPLASH:
-      splash();
-      break;
-    case WAITING:
-      waiting();
-      break;
-    case RUNNING:
-      running();
-      break;
-    case GAME_OVER:
-      game_over();
-      break;
+  case SPLASH:
+    splash();
+    break;
+  case WAITING:
+    waiting();
+    break;
+  case RUNNING:
+    running();
+    break;
+  case GAME_OVER:
+    game_over();
+    break;
   }
 }
 
