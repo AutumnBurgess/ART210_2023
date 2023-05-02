@@ -6,9 +6,8 @@ class SawSpawner extends Sprite
   int frame = 0;
   boolean done = false;
   
-  SawSpawner(int id, Saw toSpawn_, Room r)
+  SawSpawner(Saw toSpawn_, Room r)
   {
-    super(id);
     this.toSpawn = toSpawn_;
     this.myShape = this.toSpawn.myShape.clone();
     this.myShape.transparent = true;

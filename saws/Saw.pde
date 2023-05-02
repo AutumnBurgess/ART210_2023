@@ -2,11 +2,11 @@ enum SawType
 {
   SLOW, FAST, TOPWALL, BOTTOMWALL, STICKY, DROPPED, DROPPER
 }
-enum SawBehavior 
+enum SawBehavior
 {
-  BOUNCE, WALL, STICK, DISAPPEAR, DROP
+  BOUNCE, WALL, STICK, DISAPPEAR, TRAIL
 }
-class Saw extends Sprite{
+class Saw extends Sprite {
   float rotSpeed = 1.5;
   float moveSpeed = 1;
   boolean stopRotation = false;
@@ -14,15 +14,14 @@ class Saw extends Sprite{
   boolean gone = false;
   float count = 0;
   int displayOrder = 0;
-  PVector nextVelocity = new PVector(0,0);
+  PVector nextVelocity = new PVector(0, 0);
   Room room;
   SawShape myShape;
   SawType type;
-  SawBehavior behavior;
+  ArrayList<SawBehavior> behaviors;
 
-  Saw(int _id, SawShape shape, Room r)
+  Saw(SawShape shape, Room r)
   {
-    super(_id);
     this.myShape = shape;
     this.registerAnimation(new Animation(this.myShape.make()));
     this.offset = new PVector(this.myShape.outer, this.myShape.outer);
@@ -31,32 +30,28 @@ class Saw extends Sprite{
     this.h = this.myShape.outer;
     this.room = r;
   }
-  
-  float getRotSpeed()
+
+  int getDisplayOrder()
   {
-    return this.rotSpeed;
+    return this.displayOrder;
   }
-  
-  SawType getSawType()
-  {
-    return this.type;
-  }
-  
+
   void display()
   {
-    if(!this.gone)
+    if (!this.gone)
     {
       super.display();
-      if(!stopRotation) this.rotation += rotSpeed;
+      if (!stopRotation) this.rotation += rotSpeed;
     }
   }
-  
+
   void update()
   {
     super.update();
-    switch(this.behavior)
+    for(SawBehavior b : this.behaviors)
     {
-      default:
+      switch(b)
+      {
       case BOUNCE:
         this.bounce();
         break;
@@ -69,54 +64,53 @@ class Saw extends Sprite{
       case DISAPPEAR:
         this.disappear();
         break;
-      case DROP:
+      case TRAIL:
         this.drop();
         break;
+      }
     }
   }
-  
+
   void disappear()
   {
     this.count++;
-    if(this.count >= 120)
+    if (this.count >= 120)
     {
       this.gone = true;
     }
   }
-  
+
   void drop()
   {
-    this.bounce();
     this.count--;
-    if(this.count <= 0)
+    if (this.count <= 0)
     {
-      Saw newSaw = SAW_BUILDERS.get(SawType.DROPPED).build(room.saws.size(), this.room);
+      Saw newSaw = SAW_BUILDERS.get(SawType.DROPPED).build(this.room);
       newSaw.location = this.location.copy();
-      SAW_BUILDERS.get(SawType.DROPPED).setLoc(this.location.copy());
       room.addSaw(newSaw);
       this.count = 15;
     }
   }
-  
+
   void stickyBounce()
   {
-    if(!this.onWall)
+    if (!this.onWall)
     {
       float left = this.collRadius;
       float right = width-this.collRadius;
       float top = this.collRadius;
       float bottom = height-this.collRadius;
-      
-      if(this.location.x <= left || this.location.x >= right || this.location.y <= top || this.location.y >= bottom)
+
+      if (this.location.x <= left || this.location.x >= right || this.location.y <= top || this.location.y >= bottom)
       {
         this.nextVelocity.x = this.velocity.x;
         this.nextVelocity.y = this.velocity.y;
-        if(this.location.x <= left || this.location.x >= right)
+        if (this.location.x <= left || this.location.x >= right)
         {
           this.location.x = constrain(this.location.x, left, right);
           this.nextVelocity.x = - this.nextVelocity.x;
         }
-        if(this.location.y <= top || this.location.y >= bottom)
+        if (this.location.y <= top || this.location.y >= bottom)
         {
           this.location.y = constrain(this.location.y, top, bottom);
           this.nextVelocity.y = - this.nextVelocity.y;
@@ -127,11 +121,10 @@ class Saw extends Sprite{
         this.stopRotation = true;
         this.count = 10;
       }
-    }
-    else
+    } else
     {
       this.count --;
-      if(this.count == 0)
+      if (this.count == 0)
       {
         this.onWall = false;
         this.stopRotation = false;
@@ -140,24 +133,24 @@ class Saw extends Sprite{
       }
     }
   }
-  
+
   void bounce()
   {
     float left = this.w;
     float right = width-this.w;
     float top = this.h;
     float bottom = height-this.h;
-    if(this.location.x <= left || this.location.x >= right){
+    if (this.location.x <= left || this.location.x >= right) {
       this.location.x = constrain(this.location.x, left, right);
       this.velocity.x *= -1;
     }
-    
-    if(this.location.y <= top || this.location.y >= bottom){
+
+    if (this.location.y <= top || this.location.y >= bottom) {
       this.location.y = constrain(this.location.y, top, bottom);
       this.velocity.y *= -1;
     }
   }
-  
+
   void wall()
   {
     this.location.x = constrain(this.location.x, 0, width);
@@ -166,23 +159,23 @@ class Saw extends Sprite{
     boolean onRight = this.location.x == width;
     boolean onTop = this.location.y == 0;
     boolean onBottom = this.location.y == height;
-    
-    if(onLeft && !onTop)
+
+    if (onLeft && !onTop)
     {
       this.velocity.x = 0;
       this.velocity.y = -this.moveSpeed;
     }
-    if(onTop && !onRight)
+    if (onTop && !onRight)
     {
       this.velocity.x = this.moveSpeed;
       this.velocity.y = 0;
     }
-    if(onRight && !onBottom)
+    if (onRight && !onBottom)
     {
       this.velocity.x = 0;
       this.velocity.y = this.moveSpeed;
     }
-    if(onBottom && !onLeft)
+    if (onBottom && !onLeft)
     {
       this.velocity.x = -this.moveSpeed;
       this.velocity.y = 0;

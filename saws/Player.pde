@@ -5,9 +5,8 @@ class Player extends Sprite
   float drag = 0.6;
   Room room;
   
-  Player(int id, Room r)
+  Player(Room r)
   {
-    super(id);
     this.registerAnimation(new Animation(this.livingShape(200)));
     this.registerAnimation(new Animation(this.deadShape(200)));
     this.scale = 0.2;

@@ -1,7 +1,6 @@
 ///////////////////////////////////////SPRITE///////////////////////////////////////
 class Sprite
 {
-  int id;
   PVector location = new PVector(width/2,height/2);
   PVector velocity = new PVector(0,0);
   PVector acceleration = new PVector(0,0);
@@ -18,11 +17,6 @@ class Sprite
   float h;
   
   float collRadius;
-  
-  Sprite(int _id)
-  {
-    this.id = _id;
-  }
   
   void registerAnimation(Animation _anim)
   {
@@ -69,7 +63,6 @@ class Sprite
     fill(0);
     textAlign(CENTER);
     textFont(fontLarge);
-    text(this.id, 0, 20);
   }
 }
 
@@ -225,13 +218,10 @@ class Collision
   
   int circle2circle(Sprite sprite)
   {
-    if(this.sprite.id != sprite.id)
-    {
-      PVector distance = PVector.sub(this.sprite.location,sprite.location);
-      float d = distance.mag();
-      float minDistance = (this.sprite.collRadius + sprite.collRadius);
-      if(d < minDistance) return(IN);
-    }  
+    PVector distance = PVector.sub(this.sprite.location,sprite.location);
+    float d = distance.mag();
+    float minDistance = (this.sprite.collRadius + sprite.collRadius);
+    if(d < minDistance) return(IN);
     return(OUT);
   }
   

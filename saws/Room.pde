@@ -20,20 +20,21 @@ class Room
     this.spawnPattern = spawn;
     this.waitPattern = waits;
     
-    this.player = new Player(-1, this);
+    this.player = new Player(this);
     for(int i = 0; i < startSaws.length; i++)
     {
       Saw newSaw;
       float dist;
       do
       {
-        newSaw = SAW_BUILDERS.get(this.startSaws[i]).build(i, this);
+        newSaw = SAW_BUILDERS.get(this.startSaws[i]).build(this);
         dist = PVector.sub(newSaw.location, this.player.location).mag();
       }
       while(dist < 50 + newSaw.w);
       
       this.saws.add(newSaw);
     }
+    this.saws.sort(Comparator.comparing(Saw::getDisplayOrder));
   }
   
   void begin()
@@ -78,9 +79,8 @@ class Room
     {
       this.saws.addAll(sawsToAdd);
       sawsToAdd.clear();
-      this.saws.sort(Comparator.comparing(Saw::getRotSpeed));
+      this.saws.sort(Comparator.comparing(Saw::getDisplayOrder));
     }
-    
     
     this.timer = millis() - this.startTime;
     fill(0);
@@ -94,13 +94,11 @@ class Room
   void over()
   {
     this.player.display();
-    Collections.reverse(this.saws);
     for(Saw s : this.saws)
     {
       s.display();
       s.update();
     }
-    Collections.reverse(this.saws);
     this.saws.addAll(sawsToAdd);
     sawsToAdd.clear();
     
@@ -110,7 +108,7 @@ class Room
   {
     if(timer >= nextSawTime)
     {
-      this.addSpawner(SAW_BUILDERS.get(this.spawnPattern[currentSpawn]).build(this.saws.size(), this));
+      this.addSpawner(SAW_BUILDERS.get(this.spawnPattern[currentSpawn]).build(this));
       this.currentSpawn = (this.currentSpawn + 1) % this.spawnPattern.length;
       this.setNextSaw();
     }
@@ -123,7 +121,7 @@ class Room
     
   void addSpawner(Saw toSpawn)
   {
-    SawSpawner spawn = new SawSpawner(spawners.size(), toSpawn, this);
+    SawSpawner spawn = new SawSpawner(toSpawn, this);
     this.spawners.add(spawn);
   }
   
