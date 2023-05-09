@@ -72,7 +72,6 @@ class SawShape
         this.points = 70;
         this.outer = 150;
         this.inner = 110;
-        this.holeSize = 100;
         this.middleSpikes = true;
         this.col = color(5);
         break;

@@ -7,6 +7,7 @@ Room room;
 
 Audio audio = new Audio(this);
 boolean DEBUG = false;
+boolean dashTip = true;
 IntDict keysHeld = new IntDict();
 IntDict keysUsed = new IntDict();
 
@@ -50,6 +51,7 @@ void createRooms()
   toAdd.spawnPattern = new SawType[]{SawType.FAST, SawType.SLOW, SawType.FAST};
   toAdd.waitPattern = new int[]    {5000        , 5000        , 10000};
   toAdd.name = "welcome";
+  toAdd.devTime = 4700;
   toAdd.init();
   rooms.add(toAdd);
   
@@ -58,22 +60,25 @@ void createRooms()
   toAdd.spawnPattern = new SawType[]{SawType.STICKY};
   toAdd.waitPattern = new int[]    {10000};
   toAdd.name = "pay attention";
+  toAdd.devTime = 100000000;
   toAdd.init();
   rooms.add(toAdd);
   
   toAdd = new Room();
   toAdd.startSaws = new SawType[]   {SawType.CHASER, SawType.TOPWALL, SawType.BOTTOMWALL};
-  toAdd.spawnPattern = new SawType[]{SawType.CHASER, SawType.STICKY};
-  toAdd.waitPattern = new int[]    {8000,         8000};
+  toAdd.spawnPattern = new SawType[]{SawType.CHASER, SawType.STICKY, SawType.SLOW};
+  toAdd.waitPattern = new int[]    {5000,         5000,           8000};
   toAdd.name = "coming to get you";
+  toAdd.devTime = 100000000;
   toAdd.init();
   rooms.add(toAdd);
 
   toAdd = new Room();
   toAdd.startSaws = new SawType[]   {SawType.DROPPER, SawType.TOPWALL, SawType.BOTTOMWALL, SawType.LEFTWALL, SawType.RIGHTWALL};
   toAdd.spawnPattern = new SawType[]{SawType.SLOW, SawType.DROPPER};
-  toAdd.waitPattern = new int[]    {5000,       8000};
+  toAdd.waitPattern = new int[]    {5000,       5000};
   toAdd.name = "trails";
+  toAdd.devTime = 100000000;
   toAdd.init();
   rooms.add(toAdd);
   
@@ -82,6 +87,7 @@ void createRooms()
   toAdd.spawnPattern = new SawType[]{SawType.FAST, SawType.STICKY, SawType.SLOW, SawType.CHASER, SawType.DROPPER};
   toAdd.waitPattern = new int[]    {8000        , 8000        , 8000          , 8000,        8000};
   toAdd.name = "kitchen sink";
+  toAdd.devTime = 100000000;
   toAdd.init();
   rooms.add(toAdd);
   
@@ -90,6 +96,7 @@ void createRooms()
   toAdd.spawnPattern = new SawType[]{SawType.MIDDLE};
   toAdd.waitPattern = new int[]    {1000000000};
   toAdd.name = "???";
+  toAdd.devTime = 100000000;
   toAdd.init();
   rooms.add(toAdd);
 }

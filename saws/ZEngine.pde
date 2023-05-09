@@ -72,6 +72,7 @@ class Particle extends Sprite
   Particle()
   {
     this.registerAnimation(new Animation(this.confetti()));
+    this.collRadius = 2;
   }
   
   void update()
@@ -79,6 +80,24 @@ class Particle extends Sprite
     super.update();
     this.rotation += this.spinSpeed * min(this.velocity.mag(), 1);
     this.velocity.mult(0.9);
+    this.bounce();
+  }
+  
+  void bounce()
+  {
+    float left = this.w;
+    float right = width-this.w;
+    float top = this.h;
+    float bottom = height-this.h;
+    if (this.location.x <= left || this.location.x >= right) {
+      this.location.x = constrain(this.location.x, left, right);
+      this.velocity.x *= -1;
+    }
+
+    if (this.location.y <= top || this.location.y >= bottom) {
+      this.location.y = constrain(this.location.y, top, bottom);
+      this.velocity.y *= -1;
+    }
   }
   
   private PShape confetti()

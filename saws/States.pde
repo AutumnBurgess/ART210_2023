@@ -44,6 +44,17 @@ void running()
 {
   room.running();
   audio.update();
+  if(dashTip)
+  {
+    fill(0);
+    textFont(fontSmall);
+    textAlign(CENTER);
+    text("Press space to dash", width/2, height/2);
+    if(room.player.dashing)
+    {
+      dashTip = false;
+    }
+  }
 }
 
 void init_running()
@@ -58,7 +69,13 @@ void game_over()
   fill(0);
   textFont(fontLarge);
   textAlign(CENTER);
-  text("you survived " + millisAsTimer(room.timer) + "\npress r to restart", width/2, height/2);
+  String text = "you survived " + millisAsTimer(room.timer);
+  if(room.timer > room.devTime)
+  {
+    text += "\n(better than me!)";
+  }
+  text += "\npress r to restart";
+  text(text, width/2, height/2);
   if(useKey("r"))
   {
     setGameState(MENU);

@@ -1,27 +1,10 @@
-class RoomBuilder
-{
-  String name;
-  SawType[] startSaws;
-  SawType[] spawnPattern;
-  int[] waitPattern;
-  
-  Room build()
-  {
-    Room room = new Room();
-    room.startSaws = this.startSaws;
-    room.spawnPattern = this.spawnPattern;
-    room.waitPattern = this.waitPattern;
-    room.init();
-    return room;
-  }
-}
-
 class Room
 {
   SawType[] startSaws;
   SawType[] spawnPattern;
   int[] waitPattern;
   String name;
+  int devTime;
 
   int currentSpawn = 0;
   int timer = 0;

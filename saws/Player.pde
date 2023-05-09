@@ -1,14 +1,25 @@
 class Player extends Sprite
 {
   float max_speed = 5;
+  float dashSpeed = 6;
   float button_acc = 1.25;
   float drag = 0.6;
   boolean dead = false;
+  boolean dashing = false;
+  boolean stopInput = false;
+  boolean invincible = false;
+  boolean canDash = true;
+  
+  float dashTimer = 0;
+  float dashLength = 15;
+  float dashGrace = 30;
+  float dashReady = 45;
   Room room;
   
   Player(Room r)
   {
     this.registerAnimation(new Animation(this.livingShape(200)));
+    this.registerAnimation(new Animation(this.dashingShape(200)));
     this.registerAnimation(new Animation(this.deadShape(200)));
     this.scale = 0.2;
     this.collRadius = 17;
@@ -22,14 +33,47 @@ class Player extends Sprite
   
   void update()
   {
-    if (!this.dead) takeInput();
-    if (this.dead) {
-      this.velocity.mult(0.8);
+    if (this.dead) this.velocity.mult(0.8);
+    if(this.dashing)
+    {
+      this.dashTimer ++;
+      if (this.dashTimer < dashLength)
+      {
+        this.canDash = false;
+        this.invincible = true;
+        this.stopInput = true;
+        this.velocity.normalize();
+        this.velocity.mult(this.dashSpeed);
+        this.acceleration.mult(0);
+        this.currentAnim = 1;
+      }
+      else if (this.dashTimer < dashGrace)
+      {
+        this.stopInput = false;
+        this.invincible = true;
+        this.currentAnim = 0;
+      }
+      else if (this.dashTimer < dashReady)
+      {
+        this.invincible = false;
+      }
+      else if (this.dashTimer >= dashReady)
+      {
+        this.canDash = true;
+        this.dashing = false;
+        this.dashTimer = 0;
+      }
     }
+    
+    if (!this.dead) 
+    {
+      if (!this.stopInput) takeInput();
+      if (!this.invincible) this.checkSaws();
+    }
+    
     super.update();
+    this.velocity.limit(max_speed);
     this.keepInBounds();
-    if (!this.dead) this.checkSaws();
-    //this.chooseAnimation();
   }
   
   void keepInBounds()
@@ -54,8 +98,12 @@ class Player extends Sprite
     {
       this.velocity.mult(drag);
     }
-    this.velocity.limit(max_speed);
     
+    if (useKey(" ") && this.canDash) 
+    {
+      this.dashing = true;
+      this.currentAnim = 1;
+    }
   }
   
   void checkSaws()
@@ -71,7 +119,7 @@ class Player extends Sprite
   
   void die(Saw killedBy)
   {
-    this.currentAnim = 1;
+    this.currentAnim = 2;
     this.dead = true;
     this.acceleration = new PVector(0,0);
     this.velocity.x = killedBy.velocity.x;
@@ -91,29 +139,17 @@ class Player extends Sprite
     setGameState(GAME_OVER);
   }
   
-  void chooseAnimation()
-  {
-    if (this.acceleration.x == 0 && this.acceleration.y == 0 && this.currentAnim < 2)
-    {
-      this.currentAnim += 2;
-    }
-    else if(this.acceleration.x < 0)
-    {
-      this.currentAnim = 1;
-    }
-    else if (this.acceleration.x > 0)
-    {
-      this.currentAnim = 0;
-    }
-    else if (this.acceleration.y != 0 && this.currentAnim > 1){
-      this.currentAnim -= 2;
-    }
-  }
-  
   PShape livingShape(float size)
   {
     PShape out = createShape(ELLIPSE, size/2, size/2, size, size);
     out.setFill(color(25, 200, 25));
+    out.setStrokeWeight(6);
+    return out;
+  }
+  PShape dashingShape(float size)
+  {
+    PShape out = createShape(ELLIPSE, size/2, size/2, size, size);
+    out.setFill(color(25, 200, 25, 75));
     out.setStrokeWeight(6);
     return out;
   }
