@@ -37,9 +37,11 @@ class SawShape
         break;
       case TOPWALL:
       case BOTTOMWALL:
+      case LEFTWALL:
+      case RIGHTWALL:
         this.points = 15;
-        this.outer = 65;
-        this.inner = 53;
+        this.outer = 75;
+        this.inner = 63;
         this.ringSize = 35;
         this.ringCol = color(100);
         this.holeSize = 20;
@@ -65,6 +67,20 @@ class SawShape
         this.inner = 15;
         this.middleSpikes = true;
         this.col = color(202, 103, 235);
+        break;
+      case MIDDLE:
+        this.points = 70;
+        this.outer = 150;
+        this.inner = 110;
+        this.holeSize = 100;
+        this.middleSpikes = true;
+        this.col = color(5);
+        break;
+      case CHASER:
+        this.points = 15;
+        this.outer = 40;
+        this.inner = 32;
+        this.col = color(230, 28, 54);
         break;
     }
     this.angle = TWO_PI / points;
@@ -148,6 +164,8 @@ class SawShape
       borderOutside.vertex(outer * sin(i), outer * cos(i));
       borderOutside.vertex(inner * sin(i+innerOffset), inner * cos(i+innerOffset));
     }
+    
+    borderOutside.vertex(0, outer);
     
     borderOutside.endShape();
     

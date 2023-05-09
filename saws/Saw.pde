@@ -1,10 +1,10 @@
 enum SawType
 {
-  SLOW, FAST, TOPWALL, BOTTOMWALL, STICKY, DROPPED, DROPPER
+  SLOW, FAST, TOPWALL, BOTTOMWALL, LEFTWALL, RIGHTWALL, STICKY, DROPPED, DROPPER, MIDDLE, CHASER
 }
 enum SawBehavior
 {
-  BOUNCE, WALL, STICK, DISAPPEAR, TRAIL
+  BOUNCE, WALL, STICK, DISAPPEAR, TRAIL, CHASE
 }
 class Saw extends Sprite {
   float rotSpeed = 1.5;
@@ -19,12 +19,15 @@ class Saw extends Sprite {
   SawShape myShape;
   SawType type;
   ArrayList<SawBehavior> behaviors;
+  float parameter;
+  float extraOffset = 2;
 
   Saw(SawShape shape, Room r)
   {
     this.myShape = shape;
     this.registerAnimation(new Animation(this.myShape.make()));
-    this.offset = new PVector(this.myShape.outer, this.myShape.outer);
+    float offsetAmount = this.myShape.outer + extraOffset;
+    this.offset = new PVector(offsetAmount, offsetAmount);
     this.collRadius = max(this.myShape.outer-20, this.myShape.inner - 5);
     this.w = this.myShape.outer;
     this.h = this.myShape.outer;
@@ -52,29 +55,44 @@ class Saw extends Sprite {
     {
       switch(b)
       {
-      case BOUNCE:
-        this.bounce();
-        break;
-      case WALL:
-        this.wall();
-        break;
-      case STICK:
-        this.stickyBounce();
-        break;
-      case DISAPPEAR:
-        this.disappear();
-        break;
-      case TRAIL:
-        this.drop();
-        break;
+        case BOUNCE:
+          this.bounce();
+          break;
+        case WALL:
+          this.wall();
+          break;
+        case STICK:
+          this.stickyBounce();
+          break;
+        case DISAPPEAR:
+          this.disappear();
+          break;
+        case TRAIL:
+          this.drop();
+          break;
+        case CHASE:
+          this.chase();
+          break;
       }
     }
+  }
+  
+  void chase()
+  {
+    PVector playerPull = PVector.sub(this.room.player.location, this.location);
+    float playerDist = playerPull.mag();
+    playerPull.normalize();
+    playerPull.mult(0.5);
+    PVector rand = PVector.random2D();
+    rand.mult(random(1));
+    acceleration = PVector.lerp(playerPull, rand, min(playerDist / 500,1));
+    velocity.limit(this.moveSpeed);
   }
 
   void disappear()
   {
     this.count++;
-    if (this.count >= 120)
+    if (this.count >= this.parameter)
     {
       this.gone = true;
     }
@@ -86,9 +104,10 @@ class Saw extends Sprite {
     if (this.count <= 0)
     {
       Saw newSaw = SAW_BUILDERS.get(SawType.DROPPED).build(this.room);
+      newSaw.rotation = random(0,TWO_PI);
       newSaw.location = this.location.copy();
       room.addSaw(newSaw);
-      this.count = 15;
+      this.count = parameter;
     }
   }
 
@@ -119,7 +138,7 @@ class Saw extends Sprite {
         this.velocity.y = 0;
         this.onWall = true;
         this.stopRotation = true;
-        this.count = 10;
+        this.count = parameter;
       }
     } else
     {

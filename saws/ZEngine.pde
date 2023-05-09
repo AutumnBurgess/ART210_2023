@@ -95,6 +95,61 @@ class Particle extends Sprite
   }
 }
 
+class ParticleSpawner extends Sprite
+{
+  ArrayList<Particle> particles = new ArrayList<Particle>();
+  float angle;
+  
+  ParticleSpawner(PVector location, float angle)
+  {
+    this.location = location;
+    this.angle = angle;
+    int directCount = 60;
+    int spreadCount = 25;
+    float directRange = PI/4;
+    float spreadRange = PI/3;
+
+    for (int i = 0; i < directCount; i++)
+    {
+      Particle newConf = new Particle();
+      newConf.location.x = this.location.x;
+      newConf.location.y = this.location.y;
+      newConf.velocity = new PVector(random(4, 20), 0);
+      newConf.velocity.rotate(angle);
+      newConf.velocity.rotate(random(-directRange, directRange));
+      newConf.spinSpeed = random(-5, 5);
+      newConf.rotation = random(360);
+      this.particles.add(newConf);
+    }
+    for (int i = 0; i < spreadCount; i++)
+    {
+      Particle newConf = new Particle();
+      newConf.location.x = this.location.x;
+      newConf.location.y = this.location.y;
+      newConf.velocity = new PVector(random(4, 20), 0);
+      newConf.velocity.rotate(angle);
+      newConf.velocity.rotate(random(-spreadRange, spreadRange));
+      newConf.spinSpeed = random(-5, 5);
+      newConf.rotation = random(360);
+      this.particles.add(newConf);
+    }
+  }
+  
+  void update()
+  {
+    for(Particle p : this.particles){
+      p.update();
+    }
+  }
+  
+  void display()
+  {
+    for(Particle p : this.particles){
+      p.display();
+    }
+  }
+}
+
 
 ///////////////////////////////////////ANIMATION///////////////////////////////////////
 class Animation

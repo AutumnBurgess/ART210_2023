@@ -7,13 +7,15 @@ Room room;
 
 Audio audio = new Audio(this);
 boolean DEBUG = false;
-IntDict buttons = new IntDict();
+IntDict keysHeld = new IntDict();
+IntDict keysUsed = new IntDict();
 
 final int MENU = 0;
-final int WAITING = 1;
-final int RUNNING = 2;
-final int GAME_OVER = 3;
+final int RUNNING = 1;
+final int GAME_OVER = 2;
 int game_state = -1;
+
+ArrayList<Room> rooms = new ArrayList<Room>();
 
 PFont fontSmall;
 PFont fontLarge;
@@ -23,10 +25,12 @@ void setup()
   pixelDensity(displayDensity());
   fontSmall = createFont("BebasNeue-Regular.ttf", 32, true);
   fontLarge = createFont("BebasNeue-Regular.ttf", 50, true);
+  frameRate(60);
   Ani.init(this);
   setupBuilders();
   createSounds();
-  setGameState(WAITING);
+  createRooms();
+  setGameState(MENU);
 }
 
 void createSounds()
@@ -39,6 +43,57 @@ void createSounds()
   //audio.addMusic("song.mp3", "song");
 }
 
+void createRooms()
+{
+  Room toAdd = new Room();
+  toAdd.startSaws = new SawType[]   {SawType.SLOW, SawType.SLOW, SawType.FAST, SawType.FAST};
+  toAdd.spawnPattern = new SawType[]{SawType.FAST, SawType.SLOW, SawType.FAST};
+  toAdd.waitPattern = new int[]    {5000        , 5000        , 10000};
+  toAdd.name = "welcome";
+  toAdd.init();
+  rooms.add(toAdd);
+  
+  toAdd = new Room();
+  toAdd.startSaws = new SawType[]   {SawType.STICKY, SawType.STICKY, SawType.STICKY};
+  toAdd.spawnPattern = new SawType[]{SawType.STICKY};
+  toAdd.waitPattern = new int[]    {10000};
+  toAdd.name = "pay attention";
+  toAdd.init();
+  rooms.add(toAdd);
+  
+  toAdd = new Room();
+  toAdd.startSaws = new SawType[]   {SawType.CHASER, SawType.TOPWALL, SawType.BOTTOMWALL};
+  toAdd.spawnPattern = new SawType[]{SawType.CHASER, SawType.STICKY};
+  toAdd.waitPattern = new int[]    {8000,         8000};
+  toAdd.name = "coming to get you";
+  toAdd.init();
+  rooms.add(toAdd);
+
+  toAdd = new Room();
+  toAdd.startSaws = new SawType[]   {SawType.DROPPER, SawType.TOPWALL, SawType.BOTTOMWALL, SawType.LEFTWALL, SawType.RIGHTWALL};
+  toAdd.spawnPattern = new SawType[]{SawType.SLOW, SawType.DROPPER};
+  toAdd.waitPattern = new int[]    {5000,       8000};
+  toAdd.name = "trails";
+  toAdd.init();
+  rooms.add(toAdd);
+  
+  toAdd = new Room();
+  toAdd.startSaws = new SawType[]   {SawType.SLOW, SawType.DROPPER, SawType.CHASER, SawType.TOPWALL, SawType.BOTTOMWALL};
+  toAdd.spawnPattern = new SawType[]{SawType.FAST, SawType.STICKY, SawType.SLOW, SawType.CHASER, SawType.DROPPER};
+  toAdd.waitPattern = new int[]    {8000        , 8000        , 8000          , 8000,        8000};
+  toAdd.name = "kitchen sink";
+  toAdd.init();
+  rooms.add(toAdd);
+  
+  toAdd = new Room();
+  toAdd.startSaws = new SawType[]   {SawType.MIDDLE};
+  toAdd.spawnPattern = new SawType[]{SawType.MIDDLE};
+  toAdd.waitPattern = new int[]    {1000000000};
+  toAdd.name = "???";
+  toAdd.init();
+  rooms.add(toAdd);
+}
+
 void draw()
 {
   background(255);
@@ -49,9 +104,6 @@ void draw()
   {
     case MENU:
       menu();
-      break;
-    case WAITING:
-      waiting();
       break;
     case RUNNING:
       running();
@@ -70,36 +122,65 @@ void setGameState(int newState)
   case RUNNING:
     init_running();
     break;
-  case WAITING:
-    init_waiting();
+  case MENU:
+    init_menu();
     break;
   }
 }
 
 void keyPressed()
 {
-  buttons.set(str(key), 1);
+  String k = str(key);
+  if (key == CODED)
+  {
+    if (keyCode == LEFT) k = "a";
+    if (keyCode == RIGHT) k = "d";
+    if (keyCode == UP) k = "w";
+    if (keyCode == DOWN) k = "s";
+  }
+  keysHeld.set(k, 1);
+  keysUsed.set(k, 0);
   if (key == '[') DEBUG = false;
   if (key == ']') DEBUG = true;
 }
 
 void keyReleased()
 {
-  buttons.set(str(key), 0);
+  String k = str(key);
+  if (key == CODED)
+  {
+    if (keyCode == LEFT) k = "a";
+    if (keyCode == RIGHT) k = "d";
+    if (keyCode == UP) k = "w";
+    if (keyCode == DOWN) k = "s";
+  }
+  keysHeld.set(k, 0);
+  keysUsed.set(k, 0);
 }
 
 int keyHeld(String k)
 {
   try
   {
-    return buttons.get(k);
+    return keysHeld.get(k);
   }
   catch (Exception e)
   {
     //before a button is pressed, it will not be in the dict, set it to 0 for later
-    buttons.set(k, 0);
+    keysHeld.set(k, 0);
+    keysUsed.set(k, 0);
     return 0;
   }
+}
+
+boolean useKey(String k)
+{
+  int held = keyHeld(k);
+  if (held == 0) return false;
+  int used = keysUsed.get(k);
+  if (used == 1) return false;
+  keysUsed.set(k, 1);
+  return true;
 }
 
 String millisAsTimer(int millis)

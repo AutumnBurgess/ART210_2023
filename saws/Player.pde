@@ -12,6 +12,9 @@ class Player extends Sprite
     this.registerAnimation(new Animation(this.deadShape(200)));
     this.scale = 0.2;
     this.collRadius = 17;
+    this.offset = new PVector(2,2);
+    this.location.x = width/2;
+    this.location.y = 3*height/4;
     this.w = 20;
     this.h = 20;
     this.room = r;

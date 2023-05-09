@@ -1,34 +1,42 @@
 ////////////////////MENU////////////////////
+int roomSelected = 0;
 void menu()
 {
+  boolean left = useKey("a");
+  boolean right = useKey("d");
+  boolean space = useKey(" ");
   
+  int prevSelected = roomSelected;
+  
+  if(left) roomSelected --;
+  if(right) roomSelected ++;
+  roomSelected = constrain(roomSelected, 0, rooms.size()-1);
+  
+  if(space)
+  {
+    setGameState(RUNNING);
+  }
+  
+  if (prevSelected != roomSelected)
+  {
+    room = rooms.get(roomSelected);
+  }
+  
+  room.waiting();
+  
+  fill(0);
+  textFont(fontLarge);
+  textAlign(CENTER);
+  text(rooms.get(roomSelected).name + "\nPress space to start", width/2, height/2);
 }
 
 void init_menu()
 {
-  
-}
-
-////////////////////WAITING////////////////////
-void waiting()
-{
-  room.waiting();
-  fill(0);
-  textFont(fontLarge);
-  textAlign(CENTER);
-  text("press space to start", width/2, height/2);
-}
-
-void init_waiting()
-{
-  SawType[] startSaws = {SawType.SLOW, SawType.DROPPER, SawType.TOPWALL, SawType.BOTTOMWALL};
-  SawType[] spawnPattern = {SawType.FAST, SawType.FAST, SawType.STICKY, SawType.SLOW};
-  int[] waitPattern =    {5000        , 5000        , 5000          , 5000};
-  
-  //SawType[] startSaws = {SawType.STICKY, SawType.STICKY, SawType.STICKY, SawType.STICKY};
-  //SawType[] spawnPattern = {SawType.STICKY};
-  //int[] waitPattern = {5000};
-  room = new Room(startSaws, spawnPattern, waitPattern);
+  for(Room r : rooms)
+  {
+    r.init();
+  }
+  room = rooms.get(roomSelected);
 }
 
 ////////////////////RUNNING////////////////////
@@ -38,7 +46,10 @@ void running()
   audio.update();
 }
 
-void init_running(){}
+void init_running()
+{
+  room.begin();
+}
 
 ////////////////////GAME OVER////////////////////
 void game_over()
@@ -48,9 +59,13 @@ void game_over()
   textFont(fontLarge);
   textAlign(CENTER);
   text("you survived " + millisAsTimer(room.timer) + "\npress r to restart", width/2, height/2);
-  if(keyHeld("r") > 0)
+  if(useKey("r"))
   {
-    setGameState(WAITING);
+    setGameState(MENU);
+  }
+  if(useKey(str(BACKSPACE)))
+  {
+    setGameState(MENU);
   }
 }
 

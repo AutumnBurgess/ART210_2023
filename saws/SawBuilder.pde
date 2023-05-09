@@ -19,6 +19,8 @@ class SawBuilder
   private PVector velocity = new PVector(0,0);
   private boolean randLocation = false;
   private boolean randVelocity = false;
+  private float parameter = 0;
+  private float extraOffset = 2;
   private SawType type;
 
   SawBuilder(SawType type)
@@ -45,30 +47,33 @@ class SawBuilder
         break;
       case STICKY:
         this.behaviors.add(SawBehavior.STICK);
-        this.moveSpeed = 15;
-        this.rotSpeed = 5;
+        this.parameter = 10; //stick time
+        this.moveSpeed = 18;
+        this.rotSpeed = 6;
         this.randVelocity = true;
         this.randLocation = true;
         this.displayOrder = 5;
         break;
       case TOPWALL:
-        this.behaviors.add(SawBehavior.WALL);
-        this.moveSpeed = 8;
-        this.rotSpeed = 6;
+        this.makeWall();
         this.velocity = new PVector(8, 0);
         this.location = new PVector(width/2, 0);
-        this.displayOrder = 1;
         break;
       case BOTTOMWALL:
-        this.behaviors.add(SawBehavior.WALL);
-        this.moveSpeed = 8;
-        this.rotSpeed = 6;
-        this.velocity = new PVector(8, 0);
+        this.makeWall();
         this.location = new PVector(width/2, height);
-        this.displayOrder = 1;
+        break;
+      case LEFTWALL:
+        this.makeWall();
+        this.location = new PVector(0, height/2);
+        break;
+      case RIGHTWALL:
+        this.makeWall();
+        this.location = new PVector(width, height/2);
         break;
       case DROPPED:
         this.behaviors.add(SawBehavior.DISAPPEAR);
+        this.parameter = 120; //dissapear time
         this.moveSpeed = 0;
         this.rotSpeed = 2;
         this.displayOrder = 0;
@@ -76,13 +81,37 @@ class SawBuilder
       case DROPPER:
         this.behaviors.add(SawBehavior.BOUNCE);
         this.behaviors.add(SawBehavior.TRAIL);
+        this.parameter = 15; //spawn delay
         this.moveSpeed = 3;
         this.rotSpeed = 3;
         this.randVelocity = true;
         this.randLocation = true;
         this.displayOrder = 4;
         break;
+      case MIDDLE:
+        this.moveSpeed = 0;
+        this.rotSpeed = 1;
+        this.displayOrder = -1;
+        break;
+      case CHASER:
+        this.behaviors.add(SawBehavior.CHASE);
+        this.behaviors.add(SawBehavior.BOUNCE);
+        this.moveSpeed = 8;
+        this.rotSpeed = 4;
+        this.displayOrder = 6;
+        this.randLocation = true;
+        this.velocity = new PVector(0,0);
+        break;
     }
+  }
+  
+  void makeWall()
+  {
+    this.behaviors.add(SawBehavior.WALL);
+    this.moveSpeed = 8;
+    this.rotSpeed = 6;
+    this.extraOffset = 1;
+    this.displayOrder = 1;
   }
   
   Saw build(Room room)
@@ -105,6 +134,8 @@ class SawBuilder
     }
     out.rotSpeed = this.rotSpeed;
     out.behaviors = this.behaviors;
+    out.parameter = this.parameter;
+    out.extraOffset = this.extraOffset;
     if(this.randLocation)
     {
       out.location.x = random(out.w+50, width-out.w);
