@@ -3,6 +3,7 @@ class Player extends Sprite
   float max_speed = 5;
   float button_acc = 1.25;
   float drag = 0.6;
+  boolean dead = false;
   Room room;
   
   Player(Room r)
@@ -18,10 +19,13 @@ class Player extends Sprite
   
   void update()
   {
-    takeInput();
+    if (!this.dead) takeInput();
+    if (this.dead) {
+      this.velocity.mult(0.8);
+    }
     super.update();
     this.keepInBounds();
-    this.checkSaws();
+    if (!this.dead) this.checkSaws();
     //this.chooseAnimation();
   }
   
@@ -57,16 +61,30 @@ class Player extends Sprite
     for(Saw s : this.room.saws)
     {
       if(!s.gone && coll.circle2circle(s) == Collision.IN){
-        this.die();
+        this.die(s);
       }
     }
   }
   
-  void die()
+  void die(Saw killedBy)
   {
     this.currentAnim = 1;
+    this.dead = true;
+    this.acceleration = new PVector(0,0);
+    this.velocity.x = killedBy.velocity.x;
+    this.velocity.y = killedBy.velocity.y;
+    if(this.velocity.mag() < 5)
+    {
+      this.velocity.normalize();
+      this.velocity.mult(5);
+    }
     audio.playEffect("hit");
     delay(150);
+    
+    //PVector diff = PVector.sub(this.location, killedBy.location);
+    //this.room.init_game_over(killedBy.velocity.heading());
+    PVector diff = PVector.sub(this.location, killedBy.location);
+    this.room.init_game_over(diff.heading());
     setGameState(GAME_OVER);
   }
   

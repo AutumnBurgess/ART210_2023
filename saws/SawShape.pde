@@ -13,18 +13,11 @@ class SawShape
   color ringCol = color(0);
   
   boolean transparent = false;
-  static final int SMALL = 0;
-  static final int BIG = 1;
-  static final int WALL = 2;
-  static final int GREEN = 3;
-  static final int DROPPER = 4;
-  static final int DROPPED = 5;
-  
-  SawShape(int type)
+  SawShape(SawType type)
   {
     switch(type)
     {
-      case SMALL:
+      case FAST:
         this.points = 12;
         this.outer = 43;
         this.inner = 32;
@@ -33,7 +26,7 @@ class SawShape
         this.ringSize = 20;
         this.ringCol = color(175, 75, 158);
         break;
-      case BIG:
+      case SLOW:
         this.points = 21;
         this.outer = 80;
         this.inner = 65;
@@ -42,7 +35,8 @@ class SawShape
         this.ringSize = 45;
         this.ringCol = color(200, 100, 100);
         break;
-      case WALL:
+      case TOPWALL:
+      case BOTTOMWALL:
         this.points = 15;
         this.outer = 65;
         this.inner = 53;
@@ -51,7 +45,7 @@ class SawShape
         this.holeSize = 20;
         this.col = color(180);
         break;
-      case GREEN:
+      case STICKY:
         this.points = 23;
         this.outer = 30;
         this.inner = 24;

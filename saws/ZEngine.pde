@@ -65,6 +65,36 @@ class Sprite
     textFont(fontLarge);
   }
 }
+///////////////////////////////////////Particle///////////////////////////////////////
+class Particle extends Sprite
+{
+  float spinSpeed;
+  Particle()
+  {
+    this.registerAnimation(new Animation(this.confetti()));
+  }
+  
+  void update()
+  {
+    super.update();
+    this.rotation += this.spinSpeed * min(this.velocity.mag(), 1);
+    this.velocity.mult(0.9);
+  }
+  
+  private PShape confetti()
+  {
+    //color[] selection = {color(255,0,0), color(0,255,0), color(0,0,255)};
+    //color c = selection[floor(random(3))];
+    colorMode(HSB, 100);
+    color c = color(random(100), 90, random(90, 100));
+    colorMode(RGB, 255);
+    PShape out = createShape(RECT, 0, 0, 3, random(7, 17));
+    out.setFill(c);
+    out.setStroke(c);
+    return out;
+  }
+}
+
 
 ///////////////////////////////////////ANIMATION///////////////////////////////////////
 class Animation

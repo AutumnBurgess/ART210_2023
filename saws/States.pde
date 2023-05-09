@@ -43,7 +43,7 @@ void init_running(){}
 ////////////////////GAME OVER////////////////////
 void game_over()
 {
-  room.over();
+  room.game_over();
   fill(0);
   textFont(fontLarge);
   textAlign(CENTER);

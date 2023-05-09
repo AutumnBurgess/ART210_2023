@@ -14,6 +14,8 @@ class Room
   ArrayList<SawSpawner> spawners = new ArrayList<SawSpawner>();
   int nextSawTime;
   
+  ArrayList<Particle> confetti = new ArrayList<Particle>();
+  
   Room(SawType[] start, SawType[] spawn, int[] waits)
   {
     this.startSaws = start;
@@ -91,9 +93,48 @@ class Room
     this.newSaws();
   }
   
-  void over()
+  void init_game_over(float deathAngle)
   {
+    int directCount = 60;
+    int spreadCount = 25;
+    float directRange = PI/4;
+    float spreadRange = PI/3;
+    
+    for (int i = 0; i < directCount; i++)
+    {
+      Particle newConf = new Particle();
+      newConf.location.x = this.player.location.x;
+      newConf.location.y = this.player.location.y;
+      newConf.velocity = new PVector(random(4,20), 0);
+      newConf.velocity.rotate(deathAngle);
+      newConf.velocity.rotate(random(-directRange,directRange));
+      newConf.spinSpeed = random(-5, 5);
+      newConf.rotation = random(360);
+      this.confetti.add(newConf);
+    }
+    for (int i = 0; i < spreadCount; i++)
+    {
+      Particle newConf = new Particle();
+      newConf.location.x = this.player.location.x;
+      newConf.location.y = this.player.location.y;
+      newConf.velocity = new PVector(random(4,20), 0);
+      newConf.velocity.rotate(deathAngle);
+      newConf.velocity.rotate(random(-spreadRange,spreadRange));
+      newConf.spinSpeed = random(-5, 5);
+      newConf.rotation = random(360);
+      this.confetti.add(newConf);
+    }
+  }
+  
+  void game_over()
+  {
+    for(Particle p : confetti)
+    {
+      p.update();
+      p.display();
+    }
     this.player.display();
+    this.player.update();
     for(Saw s : this.saws)
     {
       s.display();

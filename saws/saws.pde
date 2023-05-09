@@ -20,7 +20,7 @@ PFont fontLarge;
 void setup()
 {
   size(800, 800, P2D);
-  //pixelDensity(2);
+  pixelDensity(displayDensity());
   fontSmall = createFont("BebasNeue-Regular.ttf", 32, true);
   fontLarge = createFont("BebasNeue-Regular.ttf", 50, true);
   Ani.init(this);
