@@ -185,7 +185,6 @@ class Animation
   {
     File dir= new File(dataPath(foldername));
     File[] files= dir.listFiles();
-    //println(files);
     Arrays.sort(files);
     if(ext == "svg")
     {
@@ -196,7 +195,6 @@ class Animation
         String path = files[i].getAbsolutePath();
         if(path.toLowerCase().endsWith(".svg"))
         {
-          //println(path);
           this.framesS[this.nFrames]=loadShape(path);
           this.nFrames = this.nFrames + 1;
         }

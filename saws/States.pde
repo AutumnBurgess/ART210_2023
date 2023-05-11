@@ -27,10 +27,14 @@ void menu()
     textAlign(CENTER);
     String screenText = rooms.get(roomSelected).name;
     screenText += "\nPress space to start";
+    if (rooms.get(roomSelected).bestTime >= 0)
+    {
+      screenText += "\nbest time " + millisAsTimer(rooms.get(roomSelected).bestTime * 1000);
+    }
 
     text(screenText, width/2, height/2 - 25);
 
-    if (roomsWon.get(roomSelected)) shape(Star, width/2, height/2 - 100);
+    if (rooms.get(roomSelected).bestTime >= 20) shape(Star, width/2, height/2 - 100);
   }
 
   if (picker.multipleAvailable)
@@ -64,12 +68,13 @@ void menu()
 }
 
 void init_menu()
-{
+{ 
   for (Room r : rooms)
   {
     r.init();
   }
   room = rooms.get(roomSelected);
+  room.justBeatTime = false;
 }
 
 ////////////////////RUNNING////////////////////
@@ -105,20 +110,32 @@ void init_running()
 void game_over()
 {
   room.game_over();
-  fill(0);
-  textFont(fontLarge);
-  textAlign(CENTER);
-  String text = "you survived " + millisAsTimer(room.timer);
-  int textHeight = height/2 - 25;
-  if (room.timer > room.devTime)
+  int secondsSurvived = floor(room.timer/1000);
+  if (rooms.get(roomSelected).name != "???")
   {
-    text += "\n(better than me!)";
-    textHeight -= 25;
+    fill(0);
+    textFont(fontLarge);
+    textAlign(CENTER);
+    
+    String text = "you survived " + millisAsTimer(secondsSurvived * 1000);
+    int textHeight = height/2 - 25;
+    if (secondsSurvived > room.devTime)
+    {
+      text += "\n(better than me!)";
+      textHeight -= 25;
+    }
+    else if (room.justBeatTime)
+    {
+      text += "\n(new best time!)";
+      textHeight -= 25;
+    }
+    
+    text += "\npress r to restart";
+    text(text, width/2, textHeight);
   }
-  text += "\npress r to restart";
-  text(text, width/2, textHeight);
 
-  boolean nextRoom = roomSelected == roomUnlocked - 1 && roomSelected != rooms.size() && room.timer > 10000;
+  boolean nextRoom = roomSelected == roomUnlocked - 1 
+    && roomSelected != rooms.size() && secondsSurvived > 10;
   if (nextRoom)
   {
     textFont(fontSmall);
@@ -134,19 +151,24 @@ void game_over()
 void init_game_over()
 {
   deathCount ++;
-  if (room.timer > 10000)
+  int secondsSurvived = floor(room.timer/1000);
+  if (secondsSurvived > room.bestTime)
+  {
+    room.bestTime = secondsSurvived;
+    room.justBeatTime = true;
+  }
+  if (secondsSurvived > 10)
   {
     roomUnlocked = max(roomUnlocked, roomSelected + 1);
   }
-  if (room.timer > 20000)
+  if (secondsSurvived > 20)
   {
-    roomsWon.set(roomSelected, true);
     if (!picker.unlocked[picker.WINNER])
     {
       boolean allWon = true;
-      for (int i = 0; i < roomsWon.size() - 1; i ++)
+      for (int i = 0; i < rooms.size() - 1; i ++)
       {
-        if (!roomsWon.get(i))
+        if (rooms.get(i).bestTime < 20)
         {
           allWon = false;
           break;
@@ -159,7 +181,7 @@ void init_game_over()
       }
     }
   }
-  if (room.name == "coming to get you" && !picker.unlocked[picker.CANDY] && room.timer > 10000)
+  if (room.name == "coming to get you" && !picker.unlocked[picker.CANDY] && secondsSurvived > 10)
   {
     nowUnlocking = picker.CANDY;
     setGameState(UNLOCK);

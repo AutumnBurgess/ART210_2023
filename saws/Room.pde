@@ -5,6 +5,8 @@ class Room
   int[] waitPattern;
   String name;
   int devTime;
+  int bestTime = -1;
+  boolean justBeatTime = false;
 
   int currentSpawn = 0;
   int timer = 0;
@@ -123,7 +125,6 @@ class Room
   {
     if (timer >= nextSawTime)
     {
-      println(currentSpawn);
       this.addSpawner(SAW_BUILDERS.get(this.spawnPattern[currentSpawn]).build(this));
       this.currentSpawn = (this.currentSpawn + 1) % this.spawnPattern.length;
       this.setNextSaw();

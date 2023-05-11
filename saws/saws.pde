@@ -24,7 +24,7 @@ int game_state = -1;
 boolean DARK_ENABLED = false;
 boolean DARK_MODE = false;
 ArrayList<Room> rooms = new ArrayList<Room>();
-ArrayList<Boolean> roomsWon = new ArrayList<Boolean>();
+ArrayList<Integer> bestTies = new ArrayList<Integer>();
 int deathCount = 0;
 int roomSelected = 0;
 int roomUnlocked = 0;
@@ -83,16 +83,16 @@ void getSaveState()
   {
     deathCount = int(lines[0]);
     roomUnlocked = int(lines[1]);
-    roomsWon.set(0, boolean(lines[2]));
-    roomsWon.set(1, boolean(lines[3]));
-    roomsWon.set(2, boolean(lines[4]));
-    roomsWon.set(3, boolean(lines[5]));
-    roomsWon.set(4, boolean(lines[6]));
-    roomsWon.set(5, boolean(lines[7]));
-    if(boolean(lines[8])) picker.unlock(1);
-    if(boolean(lines[9])) picker.unlock(2);
-    if(boolean(lines[10])) picker.unlock(3);
-    if(boolean(lines[11])) picker.unlock(4);
+    if(boolean(lines[2])) picker.unlock(1);
+    if(boolean(lines[3])) picker.unlock(2);
+    if(boolean(lines[4])) picker.unlock(3);
+    if(boolean(lines[5])) picker.unlock(4);
+    
+    rooms.get(0).bestTime = int(lines[5]);
+    rooms.get(1).bestTime = int(lines[6]);
+    rooms.get(2).bestTime = int(lines[7]);
+    rooms.get(3).bestTime = int(lines[8]);
+    rooms.get(4).bestTime = int(lines[9]);
   }
 }
 
@@ -101,16 +101,17 @@ void setSaveState()
   String[] saveState = new String[12];
   saveState[0] = str(deathCount);
   saveState[1] = str(roomUnlocked);
-  saveState[2] = str(roomsWon.get(0));
-  saveState[3] = str(roomsWon.get(1));
-  saveState[4] = str(roomsWon.get(2));
-  saveState[5] = str(roomsWon.get(3));
-  saveState[6] = str(roomsWon.get(4));
-  saveState[7] = str(roomsWon.get(5));
-  saveState[8] = str(picker.unlocked[1]);
-  saveState[9] = str(picker.unlocked[2]);
-  saveState[10] = str(picker.unlocked[3]);
-  saveState[11] = str(picker.unlocked[4]);
+
+  saveState[2] = str(picker.unlocked[1]);
+  saveState[3] = str(picker.unlocked[2]);
+  saveState[4] = str(picker.unlocked[3]);
+  saveState[5] = str(picker.unlocked[4]);
+  
+  saveState[5] = str(rooms.get(0).bestTime);
+  saveState[6] = str(rooms.get(1).bestTime);
+  saveState[7] = str(rooms.get(2).bestTime);
+  saveState[8] = str(rooms.get(3).bestTime);
+  saveState[9] = str(rooms.get(4).bestTime);
   saveStrings("data/save.txt", saveState);
 }
 
@@ -122,10 +123,9 @@ void resetSave()
   roomUnlocked = 0;
   roomSelected = 0;
   room = rooms.get(0);
-  roomsWon.clear();
   for (Room r : rooms)
   {
-    roomsWon.add(false);
+    r.bestTime = -1;
   }
   picker.reset();
   confirm_delete = false;

@@ -5,7 +5,7 @@ void createRooms()
   toAdd.spawnPattern = new SawType[]{SawType.FAST, SawType.SLOW, SawType.FAST};
   toAdd.waitPattern = new int[]    {5000        , 5000        , 10000};
   toAdd.name = "welcome";
-  toAdd.devTime = 70000;
+  toAdd.devTime = 70;
   toAdd.init();
   rooms.add(toAdd);
   
@@ -14,7 +14,7 @@ void createRooms()
   toAdd.spawnPattern = new SawType[]{SawType.STICKY};
   toAdd.waitPattern = new int[]    {10000};
   toAdd.name = "pay attention";
-  toAdd.devTime = 22000;
+  toAdd.devTime = 22;
   toAdd.init();
   rooms.add(toAdd);
   
@@ -23,7 +23,7 @@ void createRooms()
   toAdd.spawnPattern = new SawType[]{SawType.CHASER, SawType.STICKY, SawType.SLOW};
   toAdd.waitPattern = new int[]    {5000,         5000,           8000};
   toAdd.name = "coming to get you";
-  toAdd.devTime = 40000;
+  toAdd.devTime = 40;
   toAdd.init();
   rooms.add(toAdd);
 
@@ -32,7 +32,7 @@ void createRooms()
   toAdd.spawnPattern = new SawType[]{SawType.SLOW, SawType.DROPPER};
   toAdd.waitPattern = new int[]    {5000,       5000};
   toAdd.name = "trails";
-  toAdd.devTime = 76000;
+  toAdd.devTime = 76;
   toAdd.init();
   rooms.add(toAdd);
   
@@ -41,7 +41,7 @@ void createRooms()
   toAdd.spawnPattern = new SawType[]{SawType.FAST, SawType.STICKY, SawType.SLOW, SawType.CHASER, SawType.DROPPER};
   toAdd.waitPattern = new int[]    {8000        , 8000        , 8000          , 8000,        8000};
   toAdd.name = "kitchen sink";
-  toAdd.devTime = 4500;
+  toAdd.devTime = 45;
   toAdd.init();
   rooms.add(toAdd);
   
@@ -53,17 +53,6 @@ void createRooms()
   toAdd.devTime = 100000000;
   toAdd.init();
   rooms.add(toAdd);
-  
-  //roomsWon.add(false);
-  //roomsWon.add(true);
-  //roomsWon.add(true);
-  //roomsWon.add(true);
-  //roomsWon.add(true);
-  
-  for (Room r : rooms)
-  {
-    roomsWon.add(false);
-  }
 }
 
 void createSounds()
