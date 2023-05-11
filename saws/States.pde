@@ -81,7 +81,7 @@ void running()
   {
     String tipText = "";
     if (moveTip) tipText = "WASD or arrow keys to move";
-    else tipText = "Press space to dash";
+    else tipText = "Press space to dash through saws";
     fill(0);
     textFont(fontSmall);
     textAlign(CENTER);

@@ -23,6 +23,7 @@ class Room
   
   void init()
   {
+    this.currentSpawn = 0;
     this.player = new Player(this);
     this.saws.clear();
     this.sawsToAdd.clear();
@@ -122,6 +123,7 @@ class Room
   {
     if (timer >= nextSawTime)
     {
+      println(currentSpawn);
       this.addSpawner(SAW_BUILDERS.get(this.spawnPattern[currentSpawn]).build(this));
       this.currentSpawn = (this.currentSpawn + 1) % this.spawnPattern.length;
       this.setNextSaw();

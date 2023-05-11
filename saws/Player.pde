@@ -6,12 +6,12 @@ class Player extends Sprite
   float drag = 0.6;
   boolean dead = false;
   boolean dashing = false;
-  boolean stopInput = false;
+  boolean slowInput = false;
   boolean invincible = false;
   boolean canDash = true;
   
   float dashTimer = 0;
-  float dashLength = 15;
+  float dashLength = 20;
   float dashGrace = 30;
   float dashReady = 45;
   Room room;
@@ -41,7 +41,7 @@ class Player extends Sprite
       {
         this.canDash = false;
         this.invincible = true;
-        this.stopInput = true;
+        this.slowInput = true;
         this.velocity.normalize();
         this.velocity.mult(this.dashSpeed);
         this.acceleration.mult(0);
@@ -49,7 +49,7 @@ class Player extends Sprite
       }
       else if (this.dashTimer < dashGrace)
       {
-        this.stopInput = false;
+        this.slowInput = false;
         this.invincible = true;
         this.currentAnim = 0;
       }
@@ -67,7 +67,7 @@ class Player extends Sprite
     
     if (!this.dead) 
     {
-      if (!this.stopInput) takeInput();
+      takeInput();
       if (!this.invincible) this.checkSaws();
     }
     
@@ -88,12 +88,15 @@ class Player extends Sprite
   
   void takeInput()
   {
+    float addAcceleration = button_acc;
+    if (this.slowInput) addAcceleration /= 2; 
+    
     float v = keyHeld("s") - keyHeld("w");
     float h = keyHeld("d") - keyHeld("a");
     this.acceleration.y = v;
     this.acceleration.x = h;
     this.acceleration.normalize();
-    this.acceleration.mult(button_acc);
+    this.acceleration.mult(addAcceleration);
     if(this.acceleration.mag() == 0)
     {
       this.velocity.mult(drag);
