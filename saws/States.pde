@@ -8,7 +8,7 @@ void menu()
   boolean down = useKey("s");
 
   int prevSelected = roomSelected;
-  
+
   if (left) roomSelected --;
   if (right) roomSelected ++;
   //roomSelected = constrain(roomSelected, 0, rooms.size()-1);
@@ -16,9 +16,9 @@ void menu()
 
   if (space) setGameState(RUNNING);
   if (prevSelected != roomSelected) room = rooms.get(roomSelected);
-  
+
   room.waiting();
-  
+
   shapeMode(CORNER);
   if (rooms.get(roomSelected).name != "???")
   {
@@ -27,12 +27,12 @@ void menu()
     textAlign(CENTER);
     String screenText = rooms.get(roomSelected).name;
     screenText += "\nPress space to start";
-    
+
     text(screenText, width/2, height/2 - 25);
-    
+
     if (roomsWon.get(roomSelected)) shape(Star, width/2, height/2 - 100);
   }
-  
+
   if (picker.multipleAvailable)
   {
     DArrow.setFill(picker.getNextColor());
@@ -43,6 +43,22 @@ void menu()
     if (up) picker.setPrevious();
   }
   
+  if (deathCount > 0)
+  {
+    fill(0);
+    textFont(fontSmall);
+    textAlign(LEFT);
+    text("deaths: " + deathCount, 10, 42); 
+  }
+  
+  if (confirm_delete)
+  {
+    fill(0);
+    textFont(fontLarge);
+    textAlign(CENTER);
+    text("delete save?", width/2, 50);
+  }
+
   if (roomSelected < roomUnlocked) shape(RArrow, width - 40, height/2);
   if (roomSelected > 0) shape(LArrow, 40, height/2);
 }
@@ -74,7 +90,7 @@ void running()
     {
       dashTip = false;
     }
-    if ((keyHeld("s") + keyHeld("w") + keyHeld("d") + keyHeld("a")) > 0){
+    if ((keyHeld("s") + keyHeld("w") + keyHeld("d") + keyHeld("a")) > 0) {
       moveTip = false;
     }
   }
@@ -101,7 +117,7 @@ void game_over()
   }
   text += "\npress r to restart";
   text(text, width/2, textHeight);
-  
+
   boolean nextRoom = roomSelected == roomUnlocked - 1 && roomSelected != rooms.size() && room.timer > 10000;
   if (nextRoom)
   {
@@ -110,21 +126,19 @@ void game_over()
     fill(0, 180, 0);
     text("level\nunlocked!", width-5, height/2 - 16);
   }
+
+  if (useKey("r")) setGameState(MENU);
   
-  if (useKey("r"))
-  {
-    
-    setGameState(MENU);
-  }
 }
 
-void init_game_over() 
+void init_game_over()
 {
+  deathCount ++;
   if (room.timer > 10000)
   {
     roomUnlocked = max(roomUnlocked, roomSelected + 1);
   }
-  if (room.timer > 20000) 
+  if (room.timer > 20000)
   {
     roomsWon.set(roomSelected, true);
     if (!picker.unlocked[picker.WINNER])
@@ -132,7 +146,7 @@ void init_game_over()
       boolean allWon = true;
       for (int i = 0; i < roomsWon.size() - 1; i ++)
       {
-        if (!roomsWon.get(i)) 
+        if (!roomsWon.get(i))
         {
           allWon = false;
           break;
@@ -150,6 +164,12 @@ void init_game_over()
     nowUnlocking = picker.CANDY;
     setGameState(UNLOCK);
   }
+  if (deathCount >= 20 && !picker.unlocked[picker.BLUE])
+  {
+    nowUnlocking = picker.BLUE;
+    setGameState(UNLOCK);
+  }
+  setSaveState();
 }
 
 ////////////////////UNLOCK////////////////////
@@ -176,6 +196,7 @@ void unlock()
     picker.selected = nowUnlocking;
     DARK_ENABLED = true;
     DARK_MODE = true;
+    setSaveState();
     setGameState(MENU);
   }
 }

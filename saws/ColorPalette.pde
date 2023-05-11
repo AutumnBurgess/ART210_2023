@@ -4,10 +4,13 @@ class ColorPicker
   final int DARK = 1;
   final int CANDY = 2;
   final int WINNER = 3;
-  color[] outs = new color[]{color(240), color(80, 80, 82), color(237, 149, 231), color(245, 239, 56)};
-  color[] ins =  new color[]{color(210), color(40, 40, 50), color(118, 144, 207), color(217, 219, 147)};
-  String[] names = new String[]{"default", "dark", "candy", "winner"};
-  boolean[] unlocked = new boolean[]{true, false, false, false};
+  final int BLUE = 4;
+  color[] outs = 
+    new color[]{color(240), color(80, 80, 80), color(237, 149, 231), color(245, 239, 56), color(61, 64, 242)};
+  color[] ins =  
+    new color[]{color(210), color(40, 40, 40), color(118, 144, 207), color(217, 219, 147), color(43, 58, 84)};
+  String[] names = new String[]{"default", "dark", "candy", "winner", "feeling blue"};
+  boolean[] unlocked = new boolean[]{true, false, false, false, false};
   boolean multipleAvailable = false;
   int selected = 0;
 
@@ -24,6 +27,13 @@ class ColorPicker
     boolean out = unlocked[type];
     unlocked[type] = true;
     return out;
+  }
+  
+  void reset()
+  {
+    selected = 0;
+    unlocked = new boolean[]{true, false, false, false, false};
+    multipleAvailable = false;
   }
 
   void setNext()
