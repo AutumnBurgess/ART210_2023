@@ -16,15 +16,18 @@ IntDict keysUsed = new IntDict();
 final int MENU = 0;
 final int RUNNING = 1;
 final int GAME_OVER = 2;
-final int CREDITS = 3;
+final int UNLOCK = 3;
 int game_state = -1;
 
-boolean DARK_ENABLED = true;
+boolean DARK_ENABLED = false;
 boolean DARK_MODE = false;
 ArrayList<Room> rooms = new ArrayList<Room>();
 ArrayList<Boolean> roomsWon = new ArrayList<Boolean>();
 int roomSelected = 0;
 int roomUnlocked = 0;
+
+ColorPicker picker = new ColorPicker();
+int paletteSelected = 0;
 
 PShape LArrow;
 PShape RArrow;
@@ -48,11 +51,13 @@ void setup()
   createShapes();
   createRooms();
   setGameState(MENU);
+  
+  //picker.unlock(picker.WINNER);
 }
 
 void draw()
 {
-  drawBackground();
+  picker.drawCurrent();
   switch (game_state)
   {
     case MENU:
@@ -64,31 +69,9 @@ void draw()
     case GAME_OVER:
       game_over();
       break;
-    case CREDITS:
-      credits();
+    case UNLOCK:
+      unlock();
       break;
-  }
-}
-
-void drawBackground()
-{
-  stroke(1);
-  
-  //background(118, 144, 207);
-  //fill(237, 149, 231);
-  //rect(100, 100, width-200, height-200);
-  
-  if (!DARK_MODE)
-  {
-    background(240);
-    fill(210);
-    rect(100, 100, width-200, height-200);
-  }
-  else
-  {
-    background(80, 80, 82);
-    fill(80, 80, 95);
-    rect(100, 100, width-200, height-200);
   }
 }
 
@@ -97,12 +80,15 @@ void setGameState(int newState)
   game_state = newState;
   switch (newState)
   {
-  case RUNNING:
-    init_running();
-    break;
-  case MENU:
-    init_menu();
-    break;
+    case RUNNING:
+      init_running();
+      break;
+    case MENU:
+      init_menu();
+      break;
+    case GAME_OVER:
+      init_game_over();
+      break;
   }
 }
 

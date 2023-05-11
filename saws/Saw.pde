@@ -82,8 +82,12 @@ class Saw extends Sprite {
   void endGame()
   {
     this.room.hideTimer = true;
-    if (game_state == GAME_OVER) setGameState(CREDITS);
-    if (game_state == CREDITS)
+    if (game_state == GAME_OVER && !picker.unlocked[picker.DARK]) 
+    {
+      nowUnlocking = picker.DARK;
+      setGameState(UNLOCK);
+    }
+    if (game_state == UNLOCK)
     {
       ParticleSpawner ps = this.room.confetti;
       for (Particle p : ps.particles)

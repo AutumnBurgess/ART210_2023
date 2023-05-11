@@ -8,8 +8,7 @@ void menu()
   boolean down = useKey("s");
 
   int prevSelected = roomSelected;
-
-  if (DARK_ENABLED && (up || down)) DARK_MODE = !DARK_MODE;
+  
   if (left) roomSelected --;
   if (right) roomSelected ++;
   //roomSelected = constrain(roomSelected, 0, rooms.size()-1);
@@ -34,11 +33,14 @@ void menu()
     if (roomsWon.get(roomSelected)) shape(Star, width/2, height/2 - 100);
   }
   
-  if (DARK_ENABLED)
+  if (picker.multipleAvailable)
   {
-    if (DARK_MODE) DArrow.setFill(color(210));
-    else DArrow.setFill(color(80, 80, 95));
+    DArrow.setFill(picker.getNextColor());
+    UArrow.setFill(picker.getPreviousColor());
     shape(DArrow, width/2, height-40);
+    shape(UArrow, width/2, 40);
+    if (down) picker.setNext();
+    if (up) picker.setPrevious();
   }
   
   if (roomSelected < roomUnlocked) shape(RArrow, width - 40, height/2);
@@ -68,7 +70,7 @@ void running()
     textFont(fontSmall);
     textAlign(CENTER);
     text(tipText, width/2, height/2);
-    if (!moveTip && room.player.dashing)
+    if (!moveTip && keyHeld(" ") > 0)
     {
       dashTip = false;
     }
@@ -100,7 +102,7 @@ void game_over()
   text += "\npress r to restart";
   text(text, width/2, textHeight);
   
-  boolean nextRoom = roomSelected == roomUnlocked && roomSelected != rooms.size() && room.timer > 10000;
+  boolean nextRoom = roomSelected == roomUnlocked - 1 && roomSelected != rooms.size() && room.timer > 10000;
   if (nextRoom)
   {
     textFont(fontSmall);
@@ -111,37 +113,69 @@ void game_over()
   
   if (useKey("r"))
   {
-    if (nextRoom) roomUnlocked ++;
-    if (room.timer > 20000) roomsWon.set(roomSelected, true);
+    
     setGameState(MENU);
   }
 }
 
 void init_game_over() 
 {
-  
+  if (room.timer > 10000)
+  {
+    roomUnlocked = max(roomUnlocked, roomSelected + 1);
+  }
+  if (room.timer > 20000) 
+  {
+    roomsWon.set(roomSelected, true);
+    if (!picker.unlocked[picker.WINNER])
+    {
+      boolean allWon = true;
+      for (int i = 0; i < roomsWon.size() - 1; i ++)
+      {
+        if (!roomsWon.get(i)) 
+        {
+          allWon = false;
+          break;
+        }
+      }
+      if (allWon)
+      {
+        nowUnlocking = picker.WINNER;
+        setGameState(UNLOCK);
+      }
+    }
+  }
+  if (room.name == "coming to get you" && !picker.unlocked[picker.CANDY] && room.timer > 10000)
+  {
+    nowUnlocking = picker.CANDY;
+    setGameState(UNLOCK);
+  }
 }
 
-////////////////////CREDITS////////////////////
-int creditsTimer = 0;
-void credits()
+////////////////////UNLOCK////////////////////
+int nowUnlocking = 0;
+int unlockTimer = 0;
+void unlock()
 {
   room.game_over();
-  fill(0, 0, 0, creditsTimer);
+  color toFill = picker.outs[nowUnlocking];
+  fill(red(toFill), green(toFill), blue(toFill), unlockTimer);
   rect(0, 0, width, height);
-  creditsTimer += 2;
-  if (creditsTimer >= 280)
+  unlockTimer += 2;
+  if (unlockTimer >= 280)
   {
     fill(255);
     textFont(fontLarge);
     textAlign(CENTER);
-    text("dark mode unlocked", width/2, height/2);
+    text(picker.names[nowUnlocking] + " palette unlocked", width/2, height/2);
   }
-  if (creditsTimer >= 600)
+  if (unlockTimer >= 500)
   {
+    unlockTimer = 0;
+    picker.unlock(nowUnlocking);
+    picker.selected = nowUnlocking;
     DARK_ENABLED = true;
     DARK_MODE = true;
-    roomSelected = 0;
     setGameState(MENU);
   }
 }

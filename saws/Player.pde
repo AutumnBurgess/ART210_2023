@@ -132,8 +132,6 @@ class Player extends Sprite
     audio.playEffect("hit");
     delay(150);
     
-    //PVector diff = PVector.sub(this.location, killedBy.location);
-    //this.room.init_game_over(killedBy.velocity.heading());
     PVector diff = PVector.sub(this.location, killedBy.location);
     this.room.init_game_over(diff.heading());
     setGameState(GAME_OVER);
