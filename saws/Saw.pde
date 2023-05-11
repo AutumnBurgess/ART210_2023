@@ -4,7 +4,7 @@ enum SawType
 }
 enum SawBehavior
 {
-  BOUNCE, WALL, STICK, DISAPPEAR, TRAIL, CHASE
+  BOUNCE, WALL, STICK, DISAPPEAR, TRAIL, CHASE, ENDGAME
 }
 class Saw extends Sprite {
   float rotSpeed = 1.5;
@@ -73,7 +73,27 @@ class Saw extends Sprite {
         case CHASE:
           this.chase();
           break;
+        case ENDGAME:
+          this.endGame();
       }
+    }
+  }
+  
+  void endGame()
+  {
+    this.room.hideTimer = true;
+    if (game_state == GAME_OVER) setGameState(CREDITS);
+    if (game_state == CREDITS)
+    {
+      ParticleSpawner ps = this.room.confetti;
+      for (Particle p : ps.particles)
+      {
+        PVector dir = PVector.sub(this.location, p.location);
+        p.velocity.add(dir.normalize().mult(0.2));
+      }
+      Player p = this.room.player;
+      PVector dir = PVector.sub(this.location, p.location);
+      p.velocity.add(dir.normalize().mult(0.1));
     }
   }
   

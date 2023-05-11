@@ -89,6 +89,7 @@ class SawBuilder
         this.displayOrder = 4;
         break;
       case MIDDLE:
+        this.behaviors.add(SawBehavior.ENDGAME);
         this.moveSpeed = 0;
         this.rotSpeed = 1;
         this.displayOrder = -1;

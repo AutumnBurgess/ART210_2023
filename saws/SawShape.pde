@@ -71,9 +71,9 @@ class SawShape
       case MIDDLE:
         this.points = 70;
         this.outer = 150;
-        this.inner = 110;
+        this.inner = 130;
         this.middleSpikes = true;
-        this.col = color(5);
+        this.col = color(0);
         break;
       case CHASER:
         this.points = 15;

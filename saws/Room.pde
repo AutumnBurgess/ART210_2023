@@ -9,6 +9,7 @@ class Room
   int currentSpawn = 0;
   int timer = 0;
   int startTime = 0;
+  boolean hideTimer = false;
 
   Player player;
   ArrayList<Saw> saws = new ArrayList<Saw>();
@@ -86,12 +87,14 @@ class Room
       this.saws.sort(Comparator.comparing(Saw::getDisplayOrder));
     }
 
-    this.timer = millis() - this.startTime;
-    fill(0);
-    textFont(fontSmall);
-    textAlign(LEFT);
-    text(millisAsTimer(timer), 10, 30);
-
+    if (!this.hideTimer) 
+    {
+      this.timer = millis() - this.startTime;
+      fill(0);
+      textFont(fontSmall);
+      textAlign(LEFT);
+      text(millisAsTimer(timer), 10, 30);
+    }
     this.newSaws();
   }
 

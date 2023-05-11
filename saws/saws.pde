@@ -7,6 +7,8 @@ Room room;
 
 Audio audio = new Audio(this);
 boolean DEBUG = false;
+int tipCount = 2;
+boolean moveTip = true;
 boolean dashTip = true;
 IntDict keysHeld = new IntDict();
 IntDict keysUsed = new IntDict();
@@ -14,9 +16,22 @@ IntDict keysUsed = new IntDict();
 final int MENU = 0;
 final int RUNNING = 1;
 final int GAME_OVER = 2;
+final int CREDITS = 3;
 int game_state = -1;
 
+boolean DARK_ENABLED = true;
+boolean DARK_MODE = false;
 ArrayList<Room> rooms = new ArrayList<Room>();
+ArrayList<Boolean> roomsWon = new ArrayList<Boolean>();
+int roomSelected = 0;
+int roomUnlocked = 0;
+
+PShape LArrow;
+PShape RArrow;
+PShape UArrow;
+PShape DArrow;
+PShape Star;
+
 
 PFont fontSmall;
 PFont fontLarge;
@@ -30,83 +45,14 @@ void setup()
   Ani.init(this);
   setupBuilders();
   createSounds();
+  createShapes();
   createRooms();
   setGameState(MENU);
 }
 
-void createSounds()
-{
-  //PApplet app_, boolean io_, float at_, float st_, float sl_, float rt_
-  SoundEffect hit = new SoundEffect(this, false, 0.01, 0.08, 0.15, 0.2);
-  audio.addEffect(hit, "hit");
-  SoundEffect win = new SoundEffect(this, true, 0.01, 0.004, 0.3, 0.4);
-  audio.addEffect(win, "win");
-  //audio.addMusic("song.mp3", "song");
-}
-
-void createRooms()
-{
-  Room toAdd = new Room();
-  toAdd.startSaws = new SawType[]   {SawType.SLOW, SawType.SLOW, SawType.FAST, SawType.FAST};
-  toAdd.spawnPattern = new SawType[]{SawType.FAST, SawType.SLOW, SawType.FAST};
-  toAdd.waitPattern = new int[]    {5000        , 5000        , 10000};
-  toAdd.name = "welcome";
-  toAdd.devTime = 4700;
-  toAdd.init();
-  rooms.add(toAdd);
-  
-  toAdd = new Room();
-  toAdd.startSaws = new SawType[]   {SawType.STICKY, SawType.STICKY, SawType.STICKY};
-  toAdd.spawnPattern = new SawType[]{SawType.STICKY};
-  toAdd.waitPattern = new int[]    {10000};
-  toAdd.name = "pay attention";
-  toAdd.devTime = 100000000;
-  toAdd.init();
-  rooms.add(toAdd);
-  
-  toAdd = new Room();
-  toAdd.startSaws = new SawType[]   {SawType.CHASER, SawType.TOPWALL, SawType.BOTTOMWALL};
-  toAdd.spawnPattern = new SawType[]{SawType.CHASER, SawType.STICKY, SawType.SLOW};
-  toAdd.waitPattern = new int[]    {5000,         5000,           8000};
-  toAdd.name = "coming to get you";
-  toAdd.devTime = 100000000;
-  toAdd.init();
-  rooms.add(toAdd);
-
-  toAdd = new Room();
-  toAdd.startSaws = new SawType[]   {SawType.DROPPER, SawType.TOPWALL, SawType.BOTTOMWALL, SawType.LEFTWALL, SawType.RIGHTWALL};
-  toAdd.spawnPattern = new SawType[]{SawType.SLOW, SawType.DROPPER};
-  toAdd.waitPattern = new int[]    {5000,       5000};
-  toAdd.name = "trails";
-  toAdd.devTime = 100000000;
-  toAdd.init();
-  rooms.add(toAdd);
-  
-  toAdd = new Room();
-  toAdd.startSaws = new SawType[]   {SawType.SLOW, SawType.DROPPER, SawType.CHASER, SawType.TOPWALL, SawType.BOTTOMWALL};
-  toAdd.spawnPattern = new SawType[]{SawType.FAST, SawType.STICKY, SawType.SLOW, SawType.CHASER, SawType.DROPPER};
-  toAdd.waitPattern = new int[]    {8000        , 8000        , 8000          , 8000,        8000};
-  toAdd.name = "kitchen sink";
-  toAdd.devTime = 100000000;
-  toAdd.init();
-  rooms.add(toAdd);
-  
-  toAdd = new Room();
-  toAdd.startSaws = new SawType[]   {SawType.MIDDLE};
-  toAdd.spawnPattern = new SawType[]{SawType.MIDDLE};
-  toAdd.waitPattern = new int[]    {1000000000};
-  toAdd.name = "???";
-  toAdd.devTime = 100000000;
-  toAdd.init();
-  rooms.add(toAdd);
-}
-
 void draw()
 {
-  background(255);
-  stroke(1);
-  fill(230);
-  rect(100, 100, width-200, height-200);
+  drawBackground();
   switch (game_state)
   {
     case MENU:
@@ -118,6 +64,31 @@ void draw()
     case GAME_OVER:
       game_over();
       break;
+    case CREDITS:
+      credits();
+      break;
+  }
+}
+
+void drawBackground()
+{
+  stroke(1);
+  
+  //background(118, 144, 207);
+  //fill(237, 149, 231);
+  //rect(100, 100, width-200, height-200);
+  
+  if (!DARK_MODE)
+  {
+    background(240);
+    fill(210);
+    rect(100, 100, width-200, height-200);
+  }
+  else
+  {
+    background(80, 80, 82);
+    fill(80, 80, 95);
+    rect(100, 100, width-200, height-200);
   }
 }
 
