@@ -130,7 +130,7 @@ void game_over()
       textHeight -= 25;
     }
     
-    text += "\npress r to restart";
+    text += "\npress r to return to menu";
     text(text, width/2, textHeight);
   }
 
@@ -141,7 +141,7 @@ void game_over()
     textFont(fontSmall);
     textAlign(RIGHT);
     fill(0, 180, 0);
-    text("level\nunlocked!", width-5, height/2 - 16);
+    text("new room\nunlocked!", width-5, height/2 - 16);
   }
 
   if (useKey("r")) setGameState(MENU);
@@ -186,12 +186,12 @@ void init_game_over()
     nowUnlocking = picker.CANDY;
     setGameState(UNLOCK);
   }
-  if (deathCount >= 20 && !picker.unlocked[picker.BLUE])
+  if (deathCount == 20 && !picker.unlocked[picker.BLUE])
   {
     nowUnlocking = picker.BLUE;
     setGameState(UNLOCK);
   }
-  setSaveState();
+  setSave();
 }
 
 ////////////////////UNLOCK////////////////////
@@ -218,7 +218,7 @@ void unlock()
     picker.selected = nowUnlocking;
     DARK_ENABLED = true;
     DARK_MODE = true;
-    setSaveState();
+    setSave();
     setGameState(MENU);
   }
 }

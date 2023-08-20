@@ -1,22 +1,9 @@
 class SawSpawner extends Sprite
 {
   Saw toSpawn;
-  SawShape myShape;
   Room room;
   int frame = 0;
   boolean done = false;
-  
-  SawSpawner(Saw toSpawn_, Room r)
-  {
-    this.toSpawn = toSpawn_;
-    this.myShape = this.toSpawn.myShape.clone();
-    this.myShape.transparent = true;
-    this.room = r;
-    float offset = this.toSpawn.w;
-    this.offset = new PVector(offset, offset);
-    this.registerAnimation(new Animation(this.myShape.make()));
-    this.location = toSpawn.location;
-  }
   
   void display()
   {

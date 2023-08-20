@@ -8,7 +8,6 @@ Room room;
 
 Audio audio = new Audio(this);
 boolean DEBUG = false;
-int tipCount = 2;
 boolean moveTip = true;
 boolean dashTip = true;
 boolean confirm_delete = false;
@@ -43,7 +42,6 @@ PFont fontLarge;
 void setup()
 {
   size(800, 800, P2D);
-  pixelDensity(displayDensity());
   fontSmall = createFont("BebasNeue-Regular.ttf", 32, true);
   fontLarge = createFont("BebasNeue-Regular.ttf", 50, true);
   frameRate(60);
@@ -52,7 +50,7 @@ void setup()
   createSounds();
   createShapes();
   createRooms();
-  getSaveState();
+  getSave();
   setGameState(MENU);
 }
 
@@ -76,52 +74,61 @@ void draw()
   }
 }
 
-void getSaveState()
-{
-  String[] lines = loadStrings("save.txt");
-  if (lines != null)
-  {
-    deathCount = int(lines[0]);
-    roomUnlocked = int(lines[1]);
-    if(boolean(lines[2])) picker.unlock(1);
-    if(boolean(lines[3])) picker.unlock(2);
-    if(boolean(lines[4])) picker.unlock(3);
-    if(boolean(lines[5])) picker.unlock(4);
-    
-    rooms.get(0).bestTime = int(lines[5]);
-    rooms.get(1).bestTime = int(lines[6]);
-    rooms.get(2).bestTime = int(lines[7]);
-    rooms.get(3).bestTime = int(lines[8]);
-    rooms.get(4).bestTime = int(lines[9]);
+void getSave() {
+  Table table = loadTable("data/save.csv", "header");
+  if (table == null) {
+    return;
   }
+  //deathcount  roomunlocked  palette1  palette2  palette3  palette4  room0  room1  room2  room3  room4
+  TableRow data = table.getRow(0);
+  deathCount = data.getInt("deathcount");
+  roomUnlocked = data.getInt("roomunlocked");
+  if(roomUnlocked > 0){
+    moveTip = false;
+    dashTip = false;
+  }
+
+  if (data.getInt("palette1") > 0) picker.unlock(1);
+  if (data.getInt("palette2") > 0) picker.unlock(2);
+  if (data.getInt("palette3") > 0) picker.unlock(3);
+  if (data.getInt("palette4") > 0) picker.unlock(4);
+
+  rooms.get(0).bestTime = data.getInt("room0");
+  rooms.get(1).bestTime = data.getInt("room1");
+  rooms.get(2).bestTime = data.getInt("room2");
+  rooms.get(3).bestTime = data.getInt("room3");
+  rooms.get(4).bestTime = data.getInt("room4");
 }
 
-void setSaveState()
-{
-  String[] saveState = new String[12];
-  saveState[0] = str(deathCount);
-  saveState[1] = str(roomUnlocked);
+void setSave() {
+  //deathcount  roomunlocked  palette1  palette2  palette3  palette4  room0  room1  room2  room3  room4
+  Table table = loadTable("defaultsave.csv", "header");
+  //deathcount  levelunlocked  palette1  palette2  palette3  palette4  room0  room1  room2  room3  room4
+  table.setInt(0, "deathcount", deathCount);
+  table.setInt(0, "roomunlocked", roomUnlocked);
 
-  saveState[2] = str(picker.unlocked[1]);
-  saveState[3] = str(picker.unlocked[2]);
-  saveState[4] = str(picker.unlocked[3]);
-  saveState[5] = str(picker.unlocked[4]);
-  
-  saveState[5] = str(rooms.get(0).bestTime);
-  saveState[6] = str(rooms.get(1).bestTime);
-  saveState[7] = str(rooms.get(2).bestTime);
-  saveState[8] = str(rooms.get(3).bestTime);
-  saveState[9] = str(rooms.get(4).bestTime);
-  saveStrings("data/save.txt", saveState);
+  table.setInt(0, "palette1", picker.unlocked[1] ? 1 : 0);
+  table.setInt(0, "palette2", picker.unlocked[2] ? 1 : 0);
+  table.setInt(0, "palette3", picker.unlocked[3] ? 1 : 0);
+  table.setInt(0, "palette4", picker.unlocked[4] ? 1 : 0);
+
+  table.setInt(0, "room0", rooms.get(0).bestTime);
+  table.setInt(0, "room1", rooms.get(1).bestTime);
+  table.setInt(0, "room2", rooms.get(2).bestTime);
+  table.setInt(0, "room3", rooms.get(3).bestTime);
+  table.setInt(0, "room4", rooms.get(4).bestTime);
+
+  saveTable(table, "data/save.csv");
 }
 
-void resetSave()
-{
-  String[] defaultSave = loadStrings("defaultSave.txt");
-  saveStrings("data/save.txt", defaultSave);
+void resetSave() {
+  Table table = loadTable("defaultsave.csv");
+  saveTable(table, "data/save.csv");
   deathCount = 0;
   roomUnlocked = 0;
   roomSelected = 0;
+  moveTip = true;
+  dashTip = true;
   room = rooms.get(0);
   for (Room r : rooms)
   {
@@ -150,7 +157,7 @@ void setGameState(int newState)
 
 void keyPressed()
 {
-  String k = str(key);
+  String k = str(key).toLowerCase();
   if (key == CODED)
   {
     if (keyCode == LEFT) k = "a";
@@ -169,14 +176,12 @@ void keyPressed()
       if (confirm_delete)
       {
         resetSave();
-      }
-      else
+      } else
       {
         confirm_delete = true;
       }
     }
-  }
-  else
+  } else
   {
     confirm_delete = false;
   }
@@ -184,7 +189,7 @@ void keyPressed()
 
 void keyReleased()
 {
-  String k = str(key);
+  String k = str(key).toLowerCase();
   if (key == CODED)
   {
     if (keyCode == LEFT) k = "a";

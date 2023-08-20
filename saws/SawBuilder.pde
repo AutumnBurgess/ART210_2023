@@ -9,7 +9,6 @@ void setupBuilders()
 
 class SawBuilder
 {
-  private SawShape shape;
   ArrayList<SawBehavior> behaviors = new ArrayList<SawBehavior>();
   private static final float boringRange = 15;
   private int displayOrder = 0;
@@ -19,114 +18,68 @@ class SawBuilder
   private PVector velocity = new PVector(0,0);
   private boolean randLocation = false;
   private boolean randVelocity = false;
-  private float parameter = 0;
-  private float extraOffset = 2;
+  private float behaviorParameter = 0;
+  private float collRadius = 1;
+  private float size = 1;
+  private PShape sawShape;
+  private PShape blinkingShape;
   private SawType type;
 
   SawBuilder(SawType type)
   {
     this.type = type;
-    this.shape = new SawShape(type);
-    switch(type)
-    {
-      case SLOW:
-        this.behaviors.add(SawBehavior.BOUNCE);
-        this.moveSpeed = 2;
-        this.rotSpeed = 1.5;
-        this.randVelocity = true;
-        this.randLocation = true;
-        this.displayOrder = 2;
+    Table table = loadTable("sawdata.csv", "header");
+    for (TableRow row : table.rows()){
+      if(type.name().equals(row.getString("name"))){
+        getFromTable(row);
         break;
-      case FAST:
-        this.behaviors.add(SawBehavior.BOUNCE);
-        this.moveSpeed = 5;
-        this.rotSpeed = 3;
-        this.randVelocity = true;
-        this.randLocation = true;
-        this.displayOrder = 3;
-        break;
-      case STICKY:
-        this.behaviors.add(SawBehavior.STICK);
-        this.parameter = 10; //stick time
-        this.moveSpeed = 18;
-        this.rotSpeed = 6;
-        this.randVelocity = true;
-        this.randLocation = true;
-        this.displayOrder = 5;
-        break;
-      case TOPWALL:
-        this.makeWall();
-        this.velocity = new PVector(8, 0);
-        this.location = new PVector(width/2, 0);
-        break;
-      case BOTTOMWALL:
-        this.makeWall();
-        this.location = new PVector(width/2, height);
-        break;
-      case LEFTWALL:
-        this.makeWall();
-        this.location = new PVector(0, height/2);
-        break;
-      case RIGHTWALL:
-        this.makeWall();
-        this.location = new PVector(width, height/2);
-        break;
-      case DROPPED:
-        this.behaviors.add(SawBehavior.DISAPPEAR);
-        this.parameter = 120; //dissapear time
-        this.moveSpeed = 0;
-        this.rotSpeed = 2;
-        this.displayOrder = 0;
-        break;
-      case DROPPER:
-        this.behaviors.add(SawBehavior.BOUNCE);
-        this.behaviors.add(SawBehavior.TRAIL);
-        this.parameter = 15; //spawn delay
-        this.moveSpeed = 3;
-        this.rotSpeed = 3;
-        this.randVelocity = true;
-        this.randLocation = true;
-        this.displayOrder = 4;
-        break;
-      case MIDDLE:
-        this.behaviors.add(SawBehavior.ENDGAME);
-        this.moveSpeed = 0;
-        this.rotSpeed = 1;
-        this.displayOrder = -1;
-        break;
-      case CHASER:
-        this.behaviors.add(SawBehavior.CHASE);
-        this.behaviors.add(SawBehavior.BOUNCE);
-        this.moveSpeed = 8;
-        this.rotSpeed = 4;
-        this.displayOrder = 6;
-        this.randLocation = true;
-        this.velocity = new PVector(0,0);
-        break;
+      }
     }
   }
   
-  void makeWall()
-  {
-    this.behaviors.add(SawBehavior.WALL);
-    this.moveSpeed = 8;
-    this.rotSpeed = 6;
-    this.extraOffset = 1;
-    this.displayOrder = 1;
+  void getFromTable(TableRow row){
+    this.sawShape = loadShape("shapes/" + this.type.name() + ".svg");
+    this.blinkingShape = loadShape("shapes/" + this.type.name() + "_BLINK.svg");
+    String behavior1 = row.getString("behavior1");
+    this.behaviors.add(SawBehavior.valueOf(behavior1));
+    String behavior2 = row.getString("behavior2");
+    if(!behavior2.isEmpty()){
+      this.behaviors.add(SawBehavior.valueOf(behavior2));
+    }
+    this.behaviorParameter = row.getFloat("parameter");
+    this.moveSpeed = row.getFloat("movespeed");
+    this.rotSpeed = row.getFloat("rotspeed");
+    this.collRadius = row.getFloat("collradius");
+    this.size = row.getFloat("size");
+    this.displayOrder = row.getInt("displayorder");
+    if(!row.getString("locx").isEmpty()){
+      float locX = row.getFloat("locx");
+      float locY = row.getFloat("locy");
+      this.location = new PVector(locX, locY);
+    } else {
+      this.randLocation = true;
+    }
+    if(!row.getString("velx").isEmpty()){
+      float velX = row.getFloat("velx");
+      float velY = row.getFloat("vely");
+      this.velocity = new PVector(velX, velY);
+    } else {
+      this.randVelocity = true;
+    }
   }
-  
+ 
   Saw build(Room room)
   {
-    Saw out = new Saw(this.shape, room);
+    Saw out = new Saw();
+    out.type = this.type;
+    out.registerAnimation(new Animation(this.sawShape));
+    out.room = room;
     out.moveSpeed = this.moveSpeed;
     out.displayOrder = this.displayOrder;
     out.type = this.type;
     if(this.randVelocity)
     {
-      do
-      {
-        out.velocity = PVector.random2D().mult(out.moveSpeed);
-      }
+      do out.velocity = PVector.random2D().mult(out.moveSpeed);
       while(this.inBoringAngle(out.velocity));
     }
     else
@@ -135,8 +88,10 @@ class SawBuilder
     }
     out.rotSpeed = this.rotSpeed;
     out.behaviors = this.behaviors;
-    out.parameter = this.parameter;
-    out.extraOffset = this.extraOffset;
+    out.parameter = this.behaviorParameter;
+    out.collRadius = this.collRadius;
+    out.w = this.size;
+    out.h = this.size;
     if(this.randLocation)
     {
       out.location.x = random(out.w+50, width-out.w);
@@ -149,11 +104,15 @@ class SawBuilder
     return out;
   }
   
-  //SawSpawner buildSpawner(Room room)
-  //{
-  //  Saw saw = this.build(room);
-  //  return new SawSpawner(saw, room);
-  //}
+  SawSpawner buildSpawner(Room room){
+    SawSpawner out = new SawSpawner();
+    out.toSpawn = this.build(room);
+    out.room = room;
+    out.registerAnimation(new Animation(this.blinkingShape));
+    out.location = out.toSpawn.location;
+    
+    return out;
+  }
   
   boolean inBoringAngle(PVector v)
   {

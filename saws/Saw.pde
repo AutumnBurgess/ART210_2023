@@ -16,23 +16,9 @@ class Saw extends Sprite {
   int displayOrder = 0;
   PVector nextVelocity = new PVector(0, 0);
   Room room;
-  SawShape myShape;
   SawType type;
   ArrayList<SawBehavior> behaviors;
   float parameter;
-  float extraOffset = 2;
-
-  Saw(SawShape shape, Room r)
-  {
-    this.myShape = shape;
-    this.registerAnimation(new Animation(this.myShape.make()));
-    float offsetAmount = this.myShape.outer + extraOffset;
-    this.offset = new PVector(offsetAmount, offsetAmount);
-    this.collRadius = max(this.myShape.outer-20, this.myShape.inner - 5);
-    this.w = this.myShape.outer;
-    this.h = this.myShape.outer;
-    this.room = r;
-  }
 
   int getDisplayOrder()
   {
@@ -106,7 +92,7 @@ class Saw extends Sprite {
     PVector playerPull = PVector.sub(this.room.player.location, this.location);
     float playerDist = playerPull.mag();
     playerPull.normalize();
-    playerPull.mult(0.5);
+    playerPull.mult(0.75);
     PVector rand = PVector.random2D();
     rand.mult(random(1));
     acceleration = PVector.lerp(playerPull, rand, min(playerDist / 500,1));

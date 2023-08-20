@@ -125,7 +125,8 @@ class Room
   {
     if (timer >= nextSawTime)
     {
-      this.addSpawner(SAW_BUILDERS.get(this.spawnPattern[currentSpawn]).build(this));
+      SawSpawner next = SAW_BUILDERS.get(this.spawnPattern[currentSpawn]).buildSpawner(this);
+      this.spawners.add(next);
       this.currentSpawn = (this.currentSpawn + 1) % this.spawnPattern.length;
       this.setNextSaw();
     }
@@ -134,12 +135,6 @@ class Room
   void setNextSaw()
   {
     this.nextSawTime += waitPattern[this.currentSpawn];
-  }
-
-  void addSpawner(Saw toSpawn)
-  {
-    SawSpawner spawn = new SawSpawner(toSpawn, this);
-    this.spawners.add(spawn);
   }
 
   void addSaw(Saw toAdd)
